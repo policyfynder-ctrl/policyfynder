@@ -1,7 +1,26 @@
 # PolicyFynder — Project Handoff
 
 **Last updated:** 2026-06-25
-**Phase:** Milestone 5 (Lead Management) COMPLETE + verified on cloud. Lead list/detail, RBAC-scoped via RLS, status updates audited. On branch `milestone-5`. Cloud at migration parity (001–015).
+**Phase:** Milestone 6 (Appointment Management) COMPLETE + verified on local AND cloud (branch `milestone-6`). Migrations 001–017 now on both local and cloud (parity).
+
+---
+
+## Milestone 6 — Appointment Management (built local 2026-06-25, branch milestone-6)
+
+**Pages:** `/dashboard/appointments` (list: upcoming default + status filter chips) and `/dashboard/appointments/[id]` (customer+lead, RM, branch, activity timeline, status/reschedule/cancel controls). Server-first; RLS scopes all reads/writes (no admin client).
+
+**Service `src/services/appointments.ts`** (session client only): `listAppointments({status?,upcomingOnly?})`, `getAppointment(id)`, `getAppointmentActivity(id)` (reads activity_logs — needs migration 016 scoped policy), `updateAppointmentStatus(id,status,reason?)`, `rescheduleAppointment(...)`. Reschedule = create new appointment (`rescheduled_from_id`→old, same RM/lead/branch) after `get_slot_availability` RPC check + capacity-trigger backstop, then mark old `rescheduled`; rolls back the new row if the old update fails. Cancel = status→cancelled + cancellation_reason.
+
+**Server actions** `src/app/(dashboard)/appointments/actions.ts`: update status / cancel / reschedule. Gated by `appointments.update` and `appointments.cancel` (UX); RLS is the real gate. Pure helpers `src/lib/appointments.ts`. Components in `src/components/features/appointments/` (AppointmentList, AppointmentStatusBadge, AppointmentStatusForm, CancelForm, RescheduleForm [reuses SlotPicker], AppointmentTimeline). Dashboard widget `UpcomingAppointments` added to landing.
+
+**Two migrations (LOCAL ONLY — cloud push pending approval):**
+
+- **016 `appointment_audit.sql`** — (1) `activity_logs_select_scoped` policy so appointment/lead owners (not just admins) can read their timeline; visibility piggybacks on existing appointment/lead RLS via `entity_id IN (SELECT id FROM …)`. (2) Status trigger now emits specific actions: `appointment.confirmed/completed/cancelled/no_show/rescheduled`.
+- **017 `capacity_update_guard.sql`** — **bug fix**: the capacity trigger re-ran on status-only updates and counted the appointment against its own slot → confirm/complete always failed with "No capacity". Now skips the check when slot+RM unchanged. (Pre-existing bug, surfaced by M6; affects cloud too.)
+
+**Verified on LOCAL:** status updates succeed and audit `appointment.confirmed/completed`; reschedule writes `appointment.booked` (new) + `appointment.rescheduled` (old); double-booking a full slot → "No capacity" rejection; scoped timeline read — RM sees own appointment's activity (1 row), stranger sees 0. typecheck/lint pass; routes compile + guard (unauth → /login).
+
+**CLOUD VERIFIED (2026-06-25):** migrations 016+017 pushed to cloud. Status update scheduled→confirmed→completed succeeds (017 fix confirmed) and audits `appointment.booked → appointment.confirmed → appointment.completed` (016 specific actions). Cloud + local at migration parity (001–017). Cloud test appointment `a5f9fec8…` (Cloud Tester) is now status=completed (test data).
 
 ---
 

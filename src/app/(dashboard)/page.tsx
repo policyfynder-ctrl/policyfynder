@@ -2,6 +2,7 @@ import { getCurrentViewer } from '@/services/roles'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { RoleBadge } from '@/components/layout/RoleBadge'
+import { UpcomingAppointments } from '@/components/features/dashboard/UpcomingAppointments'
 import { roleLabel } from '@/lib/roles'
 
 export const metadata = { title: 'Dashboard — PolicyFynder' }
@@ -97,6 +98,8 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      <UpcomingAppointments />
     </div>
   )
 }

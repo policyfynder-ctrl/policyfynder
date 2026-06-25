@@ -1,7 +1,27 @@
 # PolicyFynder — Project Handoff
 
 **Last updated:** 2026-06-25
-**Phase:** Milestone 4 (Public Booking) COMPLETE on local. `/book/[branch]` builds lead+appointment with auto-assigned RM. Found & fixed 2 schema bugs (migrations 013 grants, 014 capacity-trigger ambiguity). ⚠️ Migrations 013+014 are LOCAL-only — cloud booking is BROKEN until they're pushed.
+**Phase:** Milestone 5 (Lead Management) COMPLETE + verified on cloud. Lead list/detail, RBAC-scoped via RLS, status updates audited. On branch `milestone-5`. Cloud at migration parity (001–015).
+
+---
+
+## Milestone 5 — Lead Management (complete 2026-06-25)
+
+**Pages:** `/dashboard/leads` (`page.tsx`) — list with status filter chips; `/dashboard/leads/[id]` — detail (customer, source, branch, assigned RM, interests, appointment history, status updater). Both server-first.
+
+**Service `src/services/leads.ts`** (server/session client only — NO admin client, NO RLS bypass): `listLeads({status?})`, `getLead(id)`, `updateLeadStatus(id,status)`. RLS scopes everything: RM→assigned, team_leader→team (`get_accessible_rm_ids`), branch/sales_manager→branch (`get_accessible_branch_ids`), super_admin/admin→all. `updateLeadStatus` returns a permission error when RLS matches 0 rows.
+
+**Status update:** server action `src/app/(dashboard)/leads/actions.ts` (`updateLeadStatusAction`) → `updateLeadStatus` → `revalidatePath`. UX-gated by `hasPermission('leads','update')`; RLS is the real gate. Client `LeadStatusForm` (useActionState).
+
+**Pure helpers `src/lib/leads.ts`:** `LEAD_STATUSES`, `LEAD_STATUS_LABELS`, `leadStatusLabel`, `isLeadStatus`, `leadStatusVariant`. Components: `LeadList`, `LeadStatusBadge`, `LeadStatusForm`.
+
+**Migration 015 (`lead_status_activity.sql`):** trigger `log_lead_status_changed` → `activity_logs` action `lead.status_changed` `{from,to}` on every status transition (DB-level → unbypassable). Complements existing `lead_stage_history` trigger. Applied to local AND cloud.
+
+**⚠️ STATUS ENUM NOTE:** requirement asked for New/Contacted/**Qualified**/Proposal Sent/**Won**/Lost, but the DB `lead_status` enum is the FIXED pipeline `new, scheduled, contacted, proposal_sent, converted, lost`. Implemented with the real enum; `converted` is labelled **"Won"**. There is **no "Qualified" state** — adding it needs an enum migration + product sign-off (deferred, flagged to user).
+
+**Verified:** local — status change writes both `lead_stage_history` and `activity_logs` (new→contacted→converted). Cloud — booking lead (`cloudtest@example.com`) visible; PATCH scheduled→contacted produced `activity_logs` `lead.status_changed` + `lead_stage_history` row. typecheck/lint pass; new routes compile + guard (unauth → /login). RBAC enforced by existing RLS (no bypass; admin client not used in leads).
+
+**Cloud note:** during verification the Cloud Tester lead status was changed scheduled→contacted (test data).
 
 ---
 
@@ -14,7 +34,8 @@
 **Components:** `src/components/features/appointments/SlotPicker.tsx` (date-grouped time grid, client), `BookingForm.tsx` (client orchestrator: slot + details + submit + confirmation). Validation in `src/lib/booking/validation.ts` (shared client+server). Public layout `src/app/(public)/layout.tsx`.
 
 **Two schema bugs found & fixed (both via the booking flow):**
-1. **Migration 013 (`api_grants.sql`)** — `anon`/`authenticated`/`service_role` had NO SELECT/INSERT grants on local (only TRUNCATE/REFERENCES/TRIGGER). Postgres needs a GRANT *and* RLS. Supabase Cloud supplies these implicitly (so cloud reads worked); local/vanilla Postgres does not. Added the standard grants + ALTER DEFAULT PRIVILEGES. RLS still gates rows (verified: anon reads branches, gets `[]` for roles).
+
+1. **Migration 013 (`api_grants.sql`)** — `anon`/`authenticated`/`service_role` had NO SELECT/INSERT grants on local (only TRUNCATE/REFERENCES/TRIGGER). Postgres needs a GRANT _and_ RLS. Supabase Cloud supplies these implicitly (so cloud reads worked); local/vanilla Postgres does not. Added the standard grants + ALTER DEFAULT PRIVILEGES. RLS still gates rows (verified: anon reads branches, gets `[]` for roles).
 2. **Migration 014 (`fix_capacity_trigger.sql`)** — `get_slot_capacity`/`get_slot_availability` had BOTH a 2-arg and a 3-arg (`DEFAULT NULL`) overload, making every 2-arg call ambiguous (`function is not unique`). The capacity trigger called the 2-arg form → **every appointment insert failed**. Fixed: trigger now calls the 3-arg branch-aware form (`NEW.branch_id`, NULL=global); dropped the 2-arg overloads. **This bug exists on cloud too.**
 
 **Verified end-to-end on LOCAL** (seeded 1 RM + 7-day schedule): page renders 200 with slots; valid booking → 200 + token, lead+appointment created with RM assigned; full slot → 409 + orphan cleaned; different slot → 200. typecheck/lint/format clean. `database.ts` regenerated from local (capacity now single 3-arg signature).

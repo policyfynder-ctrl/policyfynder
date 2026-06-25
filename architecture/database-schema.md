@@ -876,8 +876,9 @@ All 11 migration files in `supabase/migrations/`. Run in order.
 | `20260625000010_indexes_v2.sql`             | Performance   | Indexes for all new tables and columns                                                                    |
 | `20260625000011_activity_triggers.sql`      | Audit         | 6 DB triggers auto-populating activity_logs                                                               |
 | `20260625000012_get_user_permissions.sql`   | RBAC          | get_user_permissions() → text[] of "resource.action" for auth.uid(); powers the role-aware sidebar        |
-| `20260625000013_api_grants.sql`             | Access        | Explicit GRANTs to anon/authenticated/service_role (+ default privileges); RLS still gates rows            |
-| `20260625000014_fix_capacity_trigger.sql`   | Capacity      | Fix ambiguous 2-arg/3-arg capacity overloads; capacity trigger now branch-aware; drop 2-arg overloads      |
+| `20260625000013_api_grants.sql`             | Access        | Explicit GRANTs to anon/authenticated/service_role (+ default privileges); RLS still gates rows           |
+| `20260625000014_fix_capacity_trigger.sql`   | Capacity      | Fix ambiguous 2-arg/3-arg capacity overloads; capacity trigger now branch-aware; drop 2-arg overloads     |
+| `20260625000015_lead_status_activity.sql`   | Audit         | Trigger logs lead.status_changed to activity_logs on every status transition                              |
 
 ```bash
 # Apply all migrations locally

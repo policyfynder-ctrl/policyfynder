@@ -1643,6 +1643,104 @@ export type Database = {
         }
         Returns: undefined
       }
+      report_appointment_stats: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          count: number
+          status: Database["public"]["Enums"]["appointment_status"]
+        }[]
+      }
+      report_branch_performance: {
+        Args: never
+        Returns: {
+          active_policies: number
+          appts_completed: number
+          branch_id: string
+          branch_name: string
+          leads_converted: number
+          leads_total: number
+          premium_cents: number
+          renewals_completed_mtd: number
+          rm_count: number
+        }[]
+      }
+      report_lead_funnel: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          count: number
+          status: Database["public"]["Enums"]["lead_status"]
+        }[]
+      }
+      report_lead_sources: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          converted: number
+          source: string
+          total: number
+        }[]
+      }
+      report_leads_monthly: {
+        Args: { p_months?: number }
+        Returns: {
+          converted: number
+          month: string
+          total: number
+        }[]
+      }
+      report_overview: { Args: never; Returns: Json }
+      report_policy_by_insurer: {
+        Args: never
+        Returns: {
+          count: number
+          name: string
+          premium_cents: number
+        }[]
+      }
+      report_policy_by_product: {
+        Args: never
+        Returns: {
+          count: number
+          name: string
+          premium_cents: number
+        }[]
+      }
+      report_policy_status: {
+        Args: never
+        Returns: {
+          count: number
+          status: Database["public"]["Enums"]["policy_status"]
+        }[]
+      }
+      report_renewals: { Args: never; Returns: Json }
+      report_rm_performance: {
+        Args: never
+        Returns: {
+          active_policies: number
+          appts_completed: number
+          leads_converted: number
+          leads_total: number
+          renewals_completed_mtd: number
+          rm_id: string
+          rm_name: string
+          tasks_open: number
+          tasks_overdue: number
+        }[]
+      }
+      report_team_performance: {
+        Args: never
+        Returns: {
+          active_policies: number
+          appts_completed: number
+          branch_name: string
+          leads_converted: number
+          leads_total: number
+          member_count: number
+          renewals_completed_mtd: number
+          tasks_open: number
+          team_id: string
+          team_name: string
+        }[]
+      }
     }
     Enums: {
       appointment_status:

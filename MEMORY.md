@@ -1,15 +1,23 @@
 # PolicyFynder — Project Handoff
 
 **Last updated:** 2026-06-26
-**Phase:** Milestones 1–9 COMPLETE (built, verified local+cloud, committed, pushed). **Cloud + local at migration parity: 023.** On branch `milestone-9`. Next milestone: TBD.
+**Phase:** Milestones 1–10 COMPLETE (built, verified local+cloud, committed, pushed). **Cloud + local at migration parity: 024.** On branch `milestone-10`. Next milestone: TBD.
 
-**Open PRs (stacked, merge bottom-up 5→6→7→8→9):** [#2](https://github.com/policyfynder-ctrl/policyfynder/pull/2) milestone-5→main · [#3](https://github.com/policyfynder-ctrl/policyfynder/pull/3) 6→5 · [#1](https://github.com/policyfynder-ctrl/policyfynder/pull/1) 7→6 · [#4](https://github.com/policyfynder-ctrl/policyfynder/pull/4) 8→7 · #5 9→8. Repo: `github.com/policyfynder-ctrl/policyfynder`.
+**Open PRs (stacked, merge bottom-up 5→6→7→8→9→10):** [#2](https://github.com/policyfynder-ctrl/policyfynder/pull/2) 5→main · [#3](https://github.com/policyfynder-ctrl/policyfynder/pull/3) 6→5 · [#1](https://github.com/policyfynder-ctrl/policyfynder/pull/1) 7→6 · [#4](https://github.com/policyfynder-ctrl/policyfynder/pull/4) 8→7 · [#5](https://github.com/policyfynder-ctrl/policyfynder/pull/5) 9→8 · #6 10→9. Repo: `github.com/policyfynder-ctrl/policyfynder`.
+
+**Cloud test data note:** one leftover lead `cloudtest@example.com` on Head Office branch (from M4/M5 cloud verification) — disposable; it legitimately appears in branch-manager/admin report counts.
 
 **Cloud push command** (CLI not linked; password URL-encoded @→%40 #→%23 %→%25):
 `echo y | supabase db push --db-url "postgresql://postgres:Ka03%4054962%234%25@db.hbdepkvjnvrmezdjvykh.supabase.co:5432/postgres"`
 Run cloud queries from the Mac (host) or REST — the direct DB host is IPv6-only (unreachable from colima containers). Local DB: `docker exec -i supabase_db_CRM psql -U postgres -d postgres -c "..."` (no psql on host).
 
 **Standing workflow (user-enforced every milestone):** investigate schema/RLS first → present migrations → WAIT for approval → apply LOCAL → build → verify LOCAL → STOP for approval before cloud push → STOP for separate approval before commit/push. Never push cloud or commit without explicit go-ahead.
+
+---
+
+## Milestone 10 — Reports & Analytics (COMPLETE — local+cloud+committed, 2026-06-26)
+
+Migration 024 on cloud (verified 7/7 e2e: 12 functions execute; plain RM sees own only; branch manager branch-scoped; admin all; no leakage). Committed + pushed `milestone-10`; PR #6 (base milestone-9). **Approach:** 12 `SECURITY DEFINER STABLE` reporting functions that re-apply caller scope via `get_accessible_branch_ids()/get_accessible_rm_ids()/get_accessible_team_ids()` — report scope == data scope, NO RLS/permission changes (`reports.view_*` already seeded, used for page/section gating). Functions: `report_overview` (JSONB KPIs), `report_lead_funnel(from,to)`, `report_lead_sources(from,to)`, `report_leads_monthly(months)`, `report_appointment_stats(from,to)`, `report_policy_status`, `report_policy_by_insurer`, `report_policy_by_product`, `report_renewals` (JSONB), `report_rm_performance`, `report_team_performance`, `report_branch_performance`. Added indexes `idx_appointments_status`, `idx_policies_created_at`, `idx_tasks_completed`. App: `src/services/reports.ts` (typed RPC wrappers); `/dashboard/reports` (date-range filter; sections role-gated — branch scorecard→view_branch/all, team→view_team+, RM scorecard→all viewers); components `KpiTiles`/`DistributionBars`/`ReportTable`/`RenewalsSummary`. Nav Reports entry pre-existing. Money fields reference-only.
 
 ---
 
@@ -247,11 +255,11 @@ Running via **colima** (not Docker Desktop) + Supabase CLI 2.107.0.
 **Date:** 2026-06-26
 **What was built:**
 
-- **Milestone 9 (Renewals & Reminders)** finished end-to-end: applied migrations 022+023 (local + cloud), built tasks + notifications services, `/api/admin/renewals` admin API, `/dashboard/renewals` pipeline + `/dashboard/tasks` queue, nav. `generate_renewal_reminders()` creates a mandatory renewal task + optional in-app notification, idempotent.
-- Verified local (RLS scope, idempotency, audit) and cloud (8/8 e2e). Committed `Milestone 9 - Renewals and Reminders`, pushed `milestone-9`, PR #5 opened (base milestone-8, NOT merged).
+- **Milestone 10 (Reports & Analytics)** finished end-to-end: migration 024 (12 scoped `SECURITY DEFINER` reporting functions + 3 indexes) applied local + cloud; `src/services/reports.ts`, `/dashboard/reports` page (date-range + role-gated sections), report components. Nav Reports entry pre-existing.
+- Verified local (scope: RM-own / branch-confined / admin-all) and cloud (7/7 e2e). Committed `Milestone 10 - Reports and Analytics`, pushed `milestone-10`, PR #6 (base milestone-9, NOT merged).
 
-**Stopped at:** M9 complete and on cloud; all 5 milestone PRs (#1–#5) open and unmerged.
-**Next action:** Await next milestone scope from the user. (Likely candidates: Reports & Analytics, Notifications delivery worker, or merging the PR stack 5→6→7→8→9.)
+**Stopped at:** M10 complete and on cloud; all 6 milestone PRs (#1–#6) open and unmerged.
+**Next action:** Await next milestone scope from the user (or merge the PR stack 5→6→7→8→9→10).
 
 ---
 

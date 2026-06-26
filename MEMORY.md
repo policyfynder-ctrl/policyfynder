@@ -1,7 +1,27 @@
 # PolicyFynder — Project Handoff
 
 **Last updated:** 2026-06-25
-**Phase:** Milestone 6 (Appointment Management) COMPLETE + verified on local AND cloud (branch `milestone-6`). Migrations 001–017 now on both local and cloud (parity).
+**Phase:** Milestone 7 (RM & Team Management) built + verified on LOCAL (branch `milestone-7`). Migrations 018+019 applied LOCAL ONLY — ⚠️ NOT yet on cloud (awaiting approval). Cloud at migration 017. Not committed to git yet.
+
+---
+
+## Milestone 7 — RM & Team Management (built local 2026-06-25, branch milestone-7)
+
+**Pages:** `/dashboard/rms` (+ `[id]`) and `/dashboard/teams` (+ `[id]`). RM list/detail (status, branch, team, weekly schedule editor, activate/deactivate); team list/detail (branch, leader, member management). Server-first; RLS scopes reads/writes (no admin client in dashboard features).
+
+**Services (session/RLS client):** `src/services/rms.ts` (listRms, getRm, setRmActive, addRmSchedule, deleteRmSchedule), `src/services/teams.ts` (listTeams, getTeam, createTeam, addTeamMember, removeTeamMember [history-preserving: is_current=false], listAssignableRms), `src/services/branches.ts` (listManageableBranches). Pure helpers `src/lib/rms.ts`. Server actions in `(dashboard)/rms/actions.ts` + `(dashboard)/teams/actions.ts`.
+
+**RM creation — `POST /api/admin/rms`** (the only service-role usage): authorizes caller server-side (session + `rms.manage_branch` + branch in `get_accessible_branch_ids`), then promotes an existing user OR creates a new login (`auth.admin.createUser`) → sets `role='rm'`, upserts the RM record, assigns the global `rm` user_role. Service key never reaches the browser.
+
+**Embedding note:** RM↔teams has two FKs → `team:teams!relationship_managers_team_id_fkey(...)` and `leader:relationship_managers!teams_team_leader_rm_id_fkey(...)` disambiguate.
+
+**Migrations (LOCAL ONLY — cloud push pending approval):**
+- **018 `rm_team_management_rls`** — adds `get_accessible_team_ids()` + scoped write policies (additive; `is_admin()` policies remain) so the existing manage_branch/manage_own/manage_own_team permissions are actually enforced: branch managers write RMs/schedules/teams/members in their branch; team leaders/sales managers manage their own team's membership.
+- **019 `profiles_staff_read`** — **discovered gap**: profiles were self+admin only, so managers couldn't see RM NAMES (blank in RM/team/lead/appointment views). Adds scoped SELECT for `rms.view` holders over RMs in their accessible branches. Writes to profiles stay admin-only.
+
+**Verified on LOCAL:** branch manager can update an RM, create a team, add a schedule, add a team member, and read RM names (mig 019); a plain RM is denied (RLS violation). All PostgREST embeds resolve. typecheck/lint pass; routes guard (unauth → /login); `/api/admin/rms` returns 401 unauthenticated.
+
+**⚠️ NEXT (needs approval):** push migrations 018+019 to cloud, then re-verify. Cloud currently has 001–017.
 
 ---
 

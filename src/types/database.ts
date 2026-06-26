@@ -1,4 +1,10 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   graphql_public: {
@@ -64,11 +70,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'activity_logs_actor_id_fkey'
-            columns: ['actor_id']
+            foreignKeyName: "activity_logs_actor_id_fkey"
+            columns: ["actor_id"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -87,7 +93,7 @@ export type Database = {
           rescheduled_from_id: string | null
           rm_id: string
           start_time: string
-          status: Database['public']['Enums']['appointment_status']
+          status: Database["public"]["Enums"]["appointment_status"]
           updated_at: string
         }
         Insert: {
@@ -104,7 +110,7 @@ export type Database = {
           rescheduled_from_id?: string | null
           rm_id: string
           start_time: string
-          status?: Database['public']['Enums']['appointment_status']
+          status?: Database["public"]["Enums"]["appointment_status"]
           updated_at?: string
         }
         Update: {
@@ -121,37 +127,44 @@ export type Database = {
           rescheduled_from_id?: string | null
           rm_id?: string
           start_time?: string
-          status?: Database['public']['Enums']['appointment_status']
+          status?: Database["public"]["Enums"]["appointment_status"]
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: 'appointments_branch_id_fkey'
-            columns: ['branch_id']
+            foreignKeyName: "appointments_branch_id_fkey"
+            columns: ["branch_id"]
             isOneToOne: false
-            referencedRelation: 'branches'
-            referencedColumns: ['id']
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'appointments_lead_id_fkey'
-            columns: ['lead_id']
+            foreignKeyName: "appointments_lead_id_fkey"
+            columns: ["lead_id"]
             isOneToOne: false
-            referencedRelation: 'leads'
-            referencedColumns: ['id']
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'appointments_rescheduled_from_id_fkey'
-            columns: ['rescheduled_from_id']
+            foreignKeyName: "appointments_rescheduled_from_id_fkey"
+            columns: ["rescheduled_from_id"]
             isOneToOne: false
-            referencedRelation: 'appointments'
-            referencedColumns: ['id']
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'appointments_rm_id_fkey'
-            columns: ['rm_id']
+            foreignKeyName: "appointments_rm_id_fkey"
+            columns: ["rm_id"]
             isOneToOne: false
-            referencedRelation: 'relationship_managers'
-            referencedColumns: ['id']
+            referencedRelation: "relationship_managers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_rm_id_fkey"
+            columns: ["rm_id"]
+            isOneToOne: false
+            referencedRelation: "v_staff_directory"
+            referencedColumns: ["rm_id"]
           },
         ]
       }
@@ -179,11 +192,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'branch_holidays_branch_id_fkey'
-            columns: ['branch_id']
+            foreignKeyName: "branch_holidays_branch_id_fkey"
+            columns: ["branch_id"]
             isOneToOne: false
-            referencedRelation: 'branches'
-            referencedColumns: ['id']
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -254,7 +267,7 @@ export type Database = {
           id: string
           is_current: boolean
           lead_id: string
-          method: Database['public']['Enums']['assignment_method']
+          method: Database["public"]["Enums"]["assignment_method"]
           notes: string | null
           rm_id: string
           unassigned_at: string | null
@@ -265,7 +278,7 @@ export type Database = {
           id?: string
           is_current?: boolean
           lead_id: string
-          method?: Database['public']['Enums']['assignment_method']
+          method?: Database["public"]["Enums"]["assignment_method"]
           notes?: string | null
           rm_id: string
           unassigned_at?: string | null
@@ -276,32 +289,39 @@ export type Database = {
           id?: string
           is_current?: boolean
           lead_id?: string
-          method?: Database['public']['Enums']['assignment_method']
+          method?: Database["public"]["Enums"]["assignment_method"]
           notes?: string | null
           rm_id?: string
           unassigned_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: 'lead_assignments_assigned_by_fkey'
-            columns: ['assigned_by']
+            foreignKeyName: "lead_assignments_assigned_by_fkey"
+            columns: ["assigned_by"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'lead_assignments_lead_id_fkey'
-            columns: ['lead_id']
+            foreignKeyName: "lead_assignments_lead_id_fkey"
+            columns: ["lead_id"]
             isOneToOne: false
-            referencedRelation: 'leads'
-            referencedColumns: ['id']
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'lead_assignments_rm_id_fkey'
-            columns: ['rm_id']
+            foreignKeyName: "lead_assignments_rm_id_fkey"
+            columns: ["rm_id"]
             isOneToOne: false
-            referencedRelation: 'relationship_managers'
-            referencedColumns: ['id']
+            referencedRelation: "relationship_managers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_assignments_rm_id_fkey"
+            columns: ["rm_id"]
+            isOneToOne: false
+            referencedRelation: "v_staff_directory"
+            referencedColumns: ["rm_id"]
           },
         ]
       }
@@ -338,18 +358,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'lead_follow_ups_lead_id_fkey'
-            columns: ['lead_id']
+            foreignKeyName: "lead_follow_ups_lead_id_fkey"
+            columns: ["lead_id"]
             isOneToOne: false
-            referencedRelation: 'leads'
-            referencedColumns: ['id']
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'lead_follow_ups_rm_id_fkey'
-            columns: ['rm_id']
+            foreignKeyName: "lead_follow_ups_rm_id_fkey"
+            columns: ["rm_id"]
             isOneToOne: false
-            referencedRelation: 'relationship_managers'
-            referencedColumns: ['id']
+            referencedRelation: "relationship_managers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_follow_ups_rm_id_fkey"
+            columns: ["rm_id"]
+            isOneToOne: false
+            referencedRelation: "v_staff_directory"
+            referencedColumns: ["rm_id"]
           },
         ]
       }
@@ -361,7 +388,7 @@ export type Database = {
           deleted_at: string | null
           id: string
           lead_id: string
-          note_type: Database['public']['Enums']['note_type']
+          note_type: Database["public"]["Enums"]["note_type"]
           updated_at: string
         }
         Insert: {
@@ -371,7 +398,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           lead_id: string
-          note_type?: Database['public']['Enums']['note_type']
+          note_type?: Database["public"]["Enums"]["note_type"]
           updated_at?: string
         }
         Update: {
@@ -381,23 +408,23 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           lead_id?: string
-          note_type?: Database['public']['Enums']['note_type']
+          note_type?: Database["public"]["Enums"]["note_type"]
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: 'lead_notes_author_id_fkey'
-            columns: ['author_id']
+            foreignKeyName: "lead_notes_author_id_fkey"
+            columns: ["author_id"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'lead_notes_lead_id_fkey'
-            columns: ['lead_id']
+            foreignKeyName: "lead_notes_lead_id_fkey"
+            columns: ["lead_id"]
             isOneToOne: false
-            referencedRelation: 'leads'
-            referencedColumns: ['id']
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -438,44 +465,44 @@ export type Database = {
         Row: {
           changed_by: string | null
           created_at: string
-          from_stage: Database['public']['Enums']['lead_status'] | null
+          from_stage: Database["public"]["Enums"]["lead_status"] | null
           id: string
           lead_id: string
           reason: string | null
-          to_stage: Database['public']['Enums']['lead_status']
+          to_stage: Database["public"]["Enums"]["lead_status"]
         }
         Insert: {
           changed_by?: string | null
           created_at?: string
-          from_stage?: Database['public']['Enums']['lead_status'] | null
+          from_stage?: Database["public"]["Enums"]["lead_status"] | null
           id?: string
           lead_id: string
           reason?: string | null
-          to_stage: Database['public']['Enums']['lead_status']
+          to_stage: Database["public"]["Enums"]["lead_status"]
         }
         Update: {
           changed_by?: string | null
           created_at?: string
-          from_stage?: Database['public']['Enums']['lead_status'] | null
+          from_stage?: Database["public"]["Enums"]["lead_status"] | null
           id?: string
           lead_id?: string
           reason?: string | null
-          to_stage?: Database['public']['Enums']['lead_status']
+          to_stage?: Database["public"]["Enums"]["lead_status"]
         }
         Relationships: [
           {
-            foreignKeyName: 'lead_stage_history_changed_by_fkey'
-            columns: ['changed_by']
+            foreignKeyName: "lead_stage_history_changed_by_fkey"
+            columns: ["changed_by"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'lead_stage_history_lead_id_fkey'
-            columns: ['lead_id']
+            foreignKeyName: "lead_stage_history_lead_id_fkey"
+            columns: ["lead_id"]
             isOneToOne: false
-            referencedRelation: 'leads'
-            referencedColumns: ['id']
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -502,13 +529,13 @@ export type Database = {
           postal_code: string | null
           priority: number
           sla_deadline_at: string | null
-          source: Database['public']['Enums']['lead_source']
+          source: Database["public"]["Enums"]["lead_source"]
           source_campaign: string | null
           source_content: string | null
           source_id: string | null
           source_medium: string | null
           state: string | null
-          status: Database['public']['Enums']['lead_status']
+          status: Database["public"]["Enums"]["lead_status"]
           updated_at: string
         }
         Insert: {
@@ -533,13 +560,13 @@ export type Database = {
           postal_code?: string | null
           priority?: number
           sla_deadline_at?: string | null
-          source: Database['public']['Enums']['lead_source']
+          source: Database["public"]["Enums"]["lead_source"]
           source_campaign?: string | null
           source_content?: string | null
           source_id?: string | null
           source_medium?: string | null
           state?: string | null
-          status?: Database['public']['Enums']['lead_status']
+          status?: Database["public"]["Enums"]["lead_status"]
           updated_at?: string
         }
         Update: {
@@ -564,43 +591,50 @@ export type Database = {
           postal_code?: string | null
           priority?: number
           sla_deadline_at?: string | null
-          source?: Database['public']['Enums']['lead_source']
+          source?: Database["public"]["Enums"]["lead_source"]
           source_campaign?: string | null
           source_content?: string | null
           source_id?: string | null
           source_medium?: string | null
           state?: string | null
-          status?: Database['public']['Enums']['lead_status']
+          status?: Database["public"]["Enums"]["lead_status"]
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: 'leads_assigned_rm_id_fkey'
-            columns: ['assigned_rm_id']
+            foreignKeyName: "leads_assigned_rm_id_fkey"
+            columns: ["assigned_rm_id"]
             isOneToOne: false
-            referencedRelation: 'relationship_managers'
-            referencedColumns: ['id']
+            referencedRelation: "relationship_managers"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'leads_branch_id_fkey'
-            columns: ['branch_id']
+            foreignKeyName: "leads_assigned_rm_id_fkey"
+            columns: ["assigned_rm_id"]
             isOneToOne: false
-            referencedRelation: 'branches'
-            referencedColumns: ['id']
+            referencedRelation: "v_staff_directory"
+            referencedColumns: ["rm_id"]
           },
           {
-            foreignKeyName: 'leads_customer_profile_id_fkey'
-            columns: ['customer_profile_id']
+            foreignKeyName: "leads_branch_id_fkey"
+            columns: ["branch_id"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'leads_source_id_fkey'
-            columns: ['source_id']
+            foreignKeyName: "leads_customer_profile_id_fkey"
+            columns: ["customer_profile_id"]
             isOneToOne: false
-            referencedRelation: 'lead_sources'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "lead_sources"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -608,7 +642,7 @@ export type Database = {
         Row: {
           approved_at: string | null
           body_preview: string
-          channel: Database['public']['Enums']['notification_channel']
+          channel: Database["public"]["Enums"]["notification_channel"]
           created_at: string | null
           external_template_id: string | null
           id: string
@@ -622,7 +656,7 @@ export type Database = {
         Insert: {
           approved_at?: string | null
           body_preview: string
-          channel: Database['public']['Enums']['notification_channel']
+          channel: Database["public"]["Enums"]["notification_channel"]
           created_at?: string | null
           external_template_id?: string | null
           id?: string
@@ -636,7 +670,7 @@ export type Database = {
         Update: {
           approved_at?: string | null
           body_preview?: string
-          channel?: Database['public']['Enums']['notification_channel']
+          channel?: Database["public"]["Enums"]["notification_channel"]
           created_at?: string | null
           external_template_id?: string | null
           id?: string
@@ -652,7 +686,7 @@ export type Database = {
       notifications: {
         Row: {
           appointment_id: string | null
-          channel: Database['public']['Enums']['notification_channel']
+          channel: Database["public"]["Enums"]["notification_channel"]
           created_at: string
           error_message: string | null
           id: string
@@ -665,14 +699,14 @@ export type Database = {
           retry_count: number
           scheduled_at: string
           sent_at: string | null
-          status: Database['public']['Enums']['notification_status']
+          status: Database["public"]["Enums"]["notification_status"]
           template_id: string | null
           template_ref_id: string | null
-          type: Database['public']['Enums']['notification_type']
+          type: Database["public"]["Enums"]["notification_type"]
         }
         Insert: {
           appointment_id?: string | null
-          channel?: Database['public']['Enums']['notification_channel']
+          channel?: Database["public"]["Enums"]["notification_channel"]
           created_at?: string
           error_message?: string | null
           id?: string
@@ -685,14 +719,14 @@ export type Database = {
           retry_count?: number
           scheduled_at?: string
           sent_at?: string | null
-          status?: Database['public']['Enums']['notification_status']
+          status?: Database["public"]["Enums"]["notification_status"]
           template_id?: string | null
           template_ref_id?: string | null
-          type: Database['public']['Enums']['notification_type']
+          type: Database["public"]["Enums"]["notification_type"]
         }
         Update: {
           appointment_id?: string | null
-          channel?: Database['public']['Enums']['notification_channel']
+          channel?: Database["public"]["Enums"]["notification_channel"]
           created_at?: string
           error_message?: string | null
           id?: string
@@ -705,39 +739,39 @@ export type Database = {
           retry_count?: number
           scheduled_at?: string
           sent_at?: string | null
-          status?: Database['public']['Enums']['notification_status']
+          status?: Database["public"]["Enums"]["notification_status"]
           template_id?: string | null
           template_ref_id?: string | null
-          type?: Database['public']['Enums']['notification_type']
+          type?: Database["public"]["Enums"]["notification_type"]
         }
         Relationships: [
           {
-            foreignKeyName: 'notifications_appointment_id_fkey'
-            columns: ['appointment_id']
+            foreignKeyName: "notifications_appointment_id_fkey"
+            columns: ["appointment_id"]
             isOneToOne: false
-            referencedRelation: 'appointments'
-            referencedColumns: ['id']
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'notifications_lead_id_fkey'
-            columns: ['lead_id']
+            foreignKeyName: "notifications_lead_id_fkey"
+            columns: ["lead_id"]
             isOneToOne: false
-            referencedRelation: 'leads'
-            referencedColumns: ['id']
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'notifications_recipient_id_fkey'
-            columns: ['recipient_id']
+            foreignKeyName: "notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'notifications_template_ref_id_fkey'
-            columns: ['template_ref_id']
+            foreignKeyName: "notifications_template_ref_id_fkey"
+            columns: ["template_ref_id"]
             isOneToOne: false
-            referencedRelation: 'notification_templates'
-            referencedColumns: ['id']
+            referencedRelation: "notification_templates"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -774,7 +808,7 @@ export type Database = {
           full_name: string | null
           id: string
           phone: string | null
-          role: Database['public']['Enums']['user_role']
+          role: Database["public"]["Enums"]["user_role"]
           updated_at: string
         }
         Insert: {
@@ -785,7 +819,7 @@ export type Database = {
           full_name?: string | null
           id: string
           phone?: string | null
-          role?: Database['public']['Enums']['user_role']
+          role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
         }
         Update: {
@@ -796,7 +830,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           phone?: string | null
-          role?: Database['public']['Enums']['user_role']
+          role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
         }
         Relationships: []
@@ -843,25 +877,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'relationship_managers_branch_id_fkey'
-            columns: ['branch_id']
+            foreignKeyName: "relationship_managers_branch_id_fkey"
+            columns: ["branch_id"]
             isOneToOne: false
-            referencedRelation: 'branches'
-            referencedColumns: ['id']
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'relationship_managers_profile_id_fkey'
-            columns: ['profile_id']
+            foreignKeyName: "relationship_managers_profile_id_fkey"
+            columns: ["profile_id"]
             isOneToOne: true
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'relationship_managers_team_id_fkey'
-            columns: ['team_id']
+            foreignKeyName: "relationship_managers_team_id_fkey"
+            columns: ["team_id"]
             isOneToOne: false
-            referencedRelation: 'teams'
-            referencedColumns: ['id']
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -872,7 +906,7 @@ export type Database = {
           end_time: string | null
           id: string
           leave_date: string
-          leave_type: Database['public']['Enums']['leave_type']
+          leave_type: Database["public"]["Enums"]["leave_type"]
           reason: string | null
           rm_id: string
           start_time: string | null
@@ -883,7 +917,7 @@ export type Database = {
           end_time?: string | null
           id?: string
           leave_date: string
-          leave_type?: Database['public']['Enums']['leave_type']
+          leave_type?: Database["public"]["Enums"]["leave_type"]
           reason?: string | null
           rm_id: string
           start_time?: string | null
@@ -894,25 +928,32 @@ export type Database = {
           end_time?: string | null
           id?: string
           leave_date?: string
-          leave_type?: Database['public']['Enums']['leave_type']
+          leave_type?: Database["public"]["Enums"]["leave_type"]
           reason?: string | null
           rm_id?: string
           start_time?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: 'rm_leave_approved_by_fkey'
-            columns: ['approved_by']
+            foreignKeyName: "rm_leave_approved_by_fkey"
+            columns: ["approved_by"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'rm_leave_rm_id_fkey'
-            columns: ['rm_id']
+            foreignKeyName: "rm_leave_rm_id_fkey"
+            columns: ["rm_id"]
             isOneToOne: false
-            referencedRelation: 'relationship_managers'
-            referencedColumns: ['id']
+            referencedRelation: "relationship_managers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rm_leave_rm_id_fkey"
+            columns: ["rm_id"]
+            isOneToOne: false
+            referencedRelation: "v_staff_directory"
+            referencedColumns: ["rm_id"]
           },
         ]
       }
@@ -952,11 +993,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'rm_schedules_rm_id_fkey'
-            columns: ['rm_id']
+            foreignKeyName: "rm_schedules_rm_id_fkey"
+            columns: ["rm_id"]
             isOneToOne: false
-            referencedRelation: 'relationship_managers'
-            referencedColumns: ['id']
+            referencedRelation: "relationship_managers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rm_schedules_rm_id_fkey"
+            columns: ["rm_id"]
+            isOneToOne: false
+            referencedRelation: "v_staff_directory"
+            referencedColumns: ["rm_id"]
           },
         ]
       }
@@ -978,18 +1026,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'rm_specializations_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "rm_specializations_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'insurance_products'
-            referencedColumns: ['id']
+            referencedRelation: "insurance_products"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'rm_specializations_rm_id_fkey'
-            columns: ['rm_id']
+            foreignKeyName: "rm_specializations_rm_id_fkey"
+            columns: ["rm_id"]
             isOneToOne: false
-            referencedRelation: 'relationship_managers'
-            referencedColumns: ['id']
+            referencedRelation: "relationship_managers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rm_specializations_rm_id_fkey"
+            columns: ["rm_id"]
+            isOneToOne: false
+            referencedRelation: "v_staff_directory"
+            referencedColumns: ["rm_id"]
           },
         ]
       }
@@ -1008,18 +1063,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'role_permissions_permission_id_fkey'
-            columns: ['permission_id']
+            foreignKeyName: "role_permissions_permission_id_fkey"
+            columns: ["permission_id"]
             isOneToOne: false
-            referencedRelation: 'permissions'
-            referencedColumns: ['id']
+            referencedRelation: "permissions"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'role_permissions_role_id_fkey'
-            columns: ['role_id']
+            foreignKeyName: "role_permissions_role_id_fkey"
+            columns: ["role_id"]
             isOneToOne: false
-            referencedRelation: 'roles'
-            referencedColumns: ['id']
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1077,18 +1132,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'team_members_rm_id_fkey'
-            columns: ['rm_id']
+            foreignKeyName: "team_members_rm_id_fkey"
+            columns: ["rm_id"]
             isOneToOne: false
-            referencedRelation: 'relationship_managers'
-            referencedColumns: ['id']
+            referencedRelation: "relationship_managers"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'team_members_team_id_fkey'
-            columns: ['team_id']
+            foreignKeyName: "team_members_rm_id_fkey"
+            columns: ["rm_id"]
             isOneToOne: false
-            referencedRelation: 'teams'
-            referencedColumns: ['id']
+            referencedRelation: "v_staff_directory"
+            referencedColumns: ["rm_id"]
+          },
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1128,18 +1190,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'teams_branch_id_fkey'
-            columns: ['branch_id']
+            foreignKeyName: "teams_branch_id_fkey"
+            columns: ["branch_id"]
             isOneToOne: false
-            referencedRelation: 'branches'
-            referencedColumns: ['id']
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'teams_team_leader_rm_id_fkey'
-            columns: ['team_leader_rm_id']
+            foreignKeyName: "teams_team_leader_rm_id_fkey"
+            columns: ["team_leader_rm_id"]
             isOneToOne: false
-            referencedRelation: 'relationship_managers'
-            referencedColumns: ['id']
+            referencedRelation: "relationship_managers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teams_team_leader_rm_id_fkey"
+            columns: ["team_leader_rm_id"]
+            isOneToOne: false
+            referencedRelation: "v_staff_directory"
+            referencedColumns: ["rm_id"]
           },
         ]
       }
@@ -1176,25 +1245,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'user_roles_granted_by_fkey'
-            columns: ['granted_by']
+            foreignKeyName: "user_roles_granted_by_fkey"
+            columns: ["granted_by"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'user_roles_profile_id_fkey'
-            columns: ['profile_id']
+            foreignKeyName: "user_roles_profile_id_fkey"
+            columns: ["profile_id"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'user_roles_role_id_fkey'
-            columns: ['role_id']
+            foreignKeyName: "user_roles_role_id_fkey"
+            columns: ["role_id"]
             isOneToOne: false
-            referencedRelation: 'roles'
-            referencedColumns: ['id']
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1234,11 +1303,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'working_hours_config_branch_id_fkey'
-            columns: ['branch_id']
+            foreignKeyName: "working_hours_config_branch_id_fkey"
+            columns: ["branch_id"]
             isOneToOne: false
-            referencedRelation: 'branches'
-            referencedColumns: ['id']
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1255,11 +1324,36 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'working_hours_config_branch_id_fkey'
-            columns: ['branch_id']
+            foreignKeyName: "working_hours_config_branch_id_fkey"
+            columns: ["branch_id"]
             isOneToOne: false
-            referencedRelation: 'branches'
-            referencedColumns: ['id']
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_staff_directory: {
+        Row: {
+          branch_id: string | null
+          full_name: string | null
+          is_active: boolean | null
+          rm_id: string | null
+          team_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "relationship_managers_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "relationship_managers_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1267,6 +1361,7 @@ export type Database = {
     Functions: {
       get_accessible_branch_ids: { Args: never; Returns: string[] }
       get_accessible_rm_ids: { Args: never; Returns: string[] }
+      get_accessible_team_ids: { Args: never; Returns: string[] }
       get_rm_id: { Args: never; Returns: string }
       get_slot_availability: {
         Args: { p_branch_id?: string; p_date: string; p_start_time: string }
@@ -1296,33 +1391,45 @@ export type Database = {
     }
     Enums: {
       appointment_status:
-        | 'scheduled'
-        | 'confirmed'
-        | 'completed'
-        | 'cancelled'
-        | 'no_show'
-        | 'rescheduled'
+        | "scheduled"
+        | "confirmed"
+        | "completed"
+        | "cancelled"
+        | "no_show"
+        | "rescheduled"
       assignment_method:
-        | 'manual'
-        | 'round_robin'
-        | 'least_busy'
-        | 'specialist'
-        | 'geographic'
-        | 'system'
-      lead_source: 'instagram' | 'facebook' | 'google' | 'direct' | 'referral' | 'other'
-      lead_status: 'new' | 'scheduled' | 'contacted' | 'proposal_sent' | 'converted' | 'lost'
-      leave_type: 'full_day' | 'morning' | 'afternoon' | 'custom'
-      note_type: 'general' | 'call' | 'meeting' | 'follow_up' | 'internal'
-      notification_channel: 'email' | 'sms' | 'whatsapp' | 'in_app'
-      notification_status: 'pending' | 'sent' | 'delivered' | 'failed' | 'read'
+        | "manual"
+        | "round_robin"
+        | "least_busy"
+        | "specialist"
+        | "geographic"
+        | "system"
+      lead_source:
+        | "instagram"
+        | "facebook"
+        | "google"
+        | "direct"
+        | "referral"
+        | "other"
+      lead_status:
+        | "new"
+        | "scheduled"
+        | "contacted"
+        | "proposal_sent"
+        | "converted"
+        | "lost"
+      leave_type: "full_day" | "morning" | "afternoon" | "custom"
+      note_type: "general" | "call" | "meeting" | "follow_up" | "internal"
+      notification_channel: "email" | "sms" | "whatsapp" | "in_app"
+      notification_status: "pending" | "sent" | "delivered" | "failed" | "read"
       notification_type:
-        | 'appointment_confirmation'
-        | 'appointment_reminder'
-        | 'appointment_cancelled'
-        | 'lead_assigned'
-        | 'lead_updated'
-        | 'follow_up'
-      user_role: 'admin' | 'rm' | 'customer'
+        | "appointment_confirmation"
+        | "appointment_reminder"
+        | "appointment_cancelled"
+        | "lead_assigned"
+        | "lead_updated"
+        | "follow_up"
+      user_role: "admin" | "rm" | "customer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1330,31 +1437,33 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
-    ? (DefaultSchema['Tables'] & DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -1363,23 +1472,23 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -1388,23 +1497,23 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -1413,36 +1522,36 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema['Enums']
+    | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
-    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema['CompositeTypes']
+    | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
-    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
@@ -1452,36 +1561,51 @@ export const Constants = {
   public: {
     Enums: {
       appointment_status: [
-        'scheduled',
-        'confirmed',
-        'completed',
-        'cancelled',
-        'no_show',
-        'rescheduled',
+        "scheduled",
+        "confirmed",
+        "completed",
+        "cancelled",
+        "no_show",
+        "rescheduled",
       ],
       assignment_method: [
-        'manual',
-        'round_robin',
-        'least_busy',
-        'specialist',
-        'geographic',
-        'system',
+        "manual",
+        "round_robin",
+        "least_busy",
+        "specialist",
+        "geographic",
+        "system",
       ],
-      lead_source: ['instagram', 'facebook', 'google', 'direct', 'referral', 'other'],
-      lead_status: ['new', 'scheduled', 'contacted', 'proposal_sent', 'converted', 'lost'],
-      leave_type: ['full_day', 'morning', 'afternoon', 'custom'],
-      note_type: ['general', 'call', 'meeting', 'follow_up', 'internal'],
-      notification_channel: ['email', 'sms', 'whatsapp', 'in_app'],
-      notification_status: ['pending', 'sent', 'delivered', 'failed', 'read'],
+      lead_source: [
+        "instagram",
+        "facebook",
+        "google",
+        "direct",
+        "referral",
+        "other",
+      ],
+      lead_status: [
+        "new",
+        "scheduled",
+        "contacted",
+        "proposal_sent",
+        "converted",
+        "lost",
+      ],
+      leave_type: ["full_day", "morning", "afternoon", "custom"],
+      note_type: ["general", "call", "meeting", "follow_up", "internal"],
+      notification_channel: ["email", "sms", "whatsapp", "in_app"],
+      notification_status: ["pending", "sent", "delivered", "failed", "read"],
       notification_type: [
-        'appointment_confirmation',
-        'appointment_reminder',
-        'appointment_cancelled',
-        'lead_assigned',
-        'lead_updated',
-        'follow_up',
+        "appointment_confirmation",
+        "appointment_reminder",
+        "appointment_cancelled",
+        "lead_assigned",
+        "lead_updated",
+        "follow_up",
       ],
-      user_role: ['admin', 'rm', 'customer'],
+      user_role: ["admin", "rm", "customer"],
     },
   },
 } as const
+

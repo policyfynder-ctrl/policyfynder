@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import type { AppointmentStatus } from '@/types'
+import { staffNameMap } from './staff'
 
 // Appointment data access. Session/RLS client only — RM sees own, managers see
 // branch/team, super admin sees all. No admin/service-role client here.
@@ -16,11 +17,21 @@ export type AppointmentRow = {
   branch: { name: string } | null
 }
 
+// RM NAME comes from v_staff_directory (migration 019), resolved after the query
+// — not via a profiles embed, which is self+admin only.
 const LIST_SELECT =
   'id, appointment_date, start_time, end_time, status, created_at,' +
   ' lead:leads(id, first_name, last_name, email, phone),' +
-  ' rm:relationship_managers(id, profile:profiles(full_name)),' +
+  ' rm:relationship_managers(id),' +
   ' branch:branches(name)'
+
+/** Attach RM display names from the staff directory view (in place). */
+async function attachRmNames(rows: { rm: AppointmentRow['rm'] }[]): Promise<void> {
+  const names = await staffNameMap(rows.map((r) => r.rm?.id))
+  for (const r of rows) {
+    if (r.rm) r.rm.profile = { full_name: names.get(r.rm.id) ?? null }
+  }
+}
 
 /** Appointments visible to the current user (RLS-scoped). */
 export async function listAppointments(opts?: {
@@ -43,7 +54,9 @@ export async function listAppointments(opts?: {
 
   const { data, error } = await query
   if (error) throw error
-  return (data ?? []) as unknown as AppointmentRow[]
+  const rows = (data ?? []) as unknown as AppointmentRow[]
+  await attachRmNames(rows)
+  return rows
 }
 
 export type AppointmentDetail = AppointmentRow & {
@@ -67,7 +80,10 @@ export async function getAppointment(id: string): Promise<AppointmentDetail | nu
     .is('deleted_at', null)
     .maybeSingle()
   if (error) throw error
-  return (data as unknown as AppointmentDetail) ?? null
+  if (!data) return null
+  const appt = data as unknown as AppointmentDetail
+  await attachRmNames([appt])
+  return appt
 }
 
 export type ActivityEntry = {

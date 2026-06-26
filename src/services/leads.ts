@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import type { LeadStatus } from '@/types'
+import { staffNameMap } from './staff'
 
 // Lead data access. Uses the standard server (session) client throughout, so RLS
 // scopes every read/write to the caller's role automatically — RM sees assigned,
@@ -22,11 +23,21 @@ export type LeadListRow = {
   branch: { name: string } | null
 }
 
+// assigned-RM NAME comes from v_staff_directory (migration 019), resolved after
+// the query — not via a profiles embed, which is self+admin only.
 const LIST_SELECT =
   'id, first_name, last_name, email, phone, status, priority, created_at, insurance_interest,' +
   ' source:lead_sources(name),' +
-  ' assigned_rm:relationship_managers(id, profile:profiles(full_name)),' +
+  ' assigned_rm:relationship_managers(id),' +
   ' branch:branches(name)'
+
+/** Attach assigned-RM display names from the staff directory view (in place). */
+async function attachRmNames(rows: { assigned_rm: LeadListRow['assigned_rm'] }[]): Promise<void> {
+  const names = await staffNameMap(rows.map((r) => r.assigned_rm?.id))
+  for (const r of rows) {
+    if (r.assigned_rm) r.assigned_rm.profile = { full_name: names.get(r.assigned_rm.id) ?? null }
+  }
+}
 
 /** Leads visible to the current user (RLS-scoped). Optional status filter. */
 export async function listLeads(opts?: { status?: LeadStatus }): Promise<LeadListRow[]> {
@@ -41,7 +52,9 @@ export async function listLeads(opts?: { status?: LeadStatus }): Promise<LeadLis
 
   const { data, error } = await query
   if (error) throw error
-  return (data ?? []) as unknown as LeadListRow[]
+  const rows = (data ?? []) as unknown as LeadListRow[]
+  await attachRmNames(rows)
+  return rows
 }
 
 export type LeadDetail = LeadListRow & {
@@ -71,7 +84,10 @@ export async function getLead(id: string): Promise<LeadDetail | null> {
     .is('deleted_at', null)
     .maybeSingle()
   if (error) throw error
-  return (data as unknown as LeadDetail) ?? null
+  if (!data) return null
+  const lead = data as unknown as LeadDetail
+  await attachRmNames([lead])
+  return lead
 }
 
 export type UpdateStatusResult = { ok: true; status: LeadStatus } | { ok: false; error: string }

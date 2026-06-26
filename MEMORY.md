@@ -5,7 +5,7 @@
 
 **Open PRs (stacked, merge bottom-up 5→6→7→8→9→10):** [#2](https://github.com/policyfynder-ctrl/policyfynder/pull/2) 5→main · [#3](https://github.com/policyfynder-ctrl/policyfynder/pull/3) 6→5 · [#1](https://github.com/policyfynder-ctrl/policyfynder/pull/1) 7→6 · [#4](https://github.com/policyfynder-ctrl/policyfynder/pull/4) 8→7 · [#5](https://github.com/policyfynder-ctrl/policyfynder/pull/5) 9→8 · #6 10→9. Repo: `github.com/policyfynder-ctrl/policyfynder`.
 
-**Cloud test data note:** one leftover lead `cloudtest@example.com` on Head Office branch (from M4/M5 cloud verification) — disposable; it legitimately appears in branch-manager/admin report counts.
+**Cloud test data note:** Cloud test data has been cleaned up. The disposable cloudtest@example.com lead, appointment, and related activity logs were deleted after Milestone 10 verification. The seeded RM (cloud_rm@policyfynder.test) and its schedules remain as permanent seed data.
 
 **Cloud push command** (CLI not linked; password URL-encoded @→%40 #→%23 %→%25):
 `echo y | supabase db push --db-url "postgresql://postgres:Ka03%4054962%234%25@db.hbdepkvjnvrmezdjvykh.supabase.co:5432/postgres"`

@@ -4,6 +4,8 @@ import { Badge } from '@/components/ui/badge'
 import { RoleBadge } from '@/components/layout/RoleBadge'
 import { UpcomingAppointments } from '@/components/features/dashboard/UpcomingAppointments'
 import { PolicyStats } from '@/components/features/dashboard/PolicyStats'
+import { CustomerDashboard } from '@/components/features/portal/CustomerDashboard'
+import { getCustomerDashboard } from '@/services/portal'
 import { roleLabel } from '@/lib/roles'
 
 export const metadata = { title: 'Dashboard — PolicyFynder' }
@@ -14,6 +16,12 @@ export const metadata = { title: 'Dashboard — PolicyFynder' }
 export default async function DashboardPage() {
   const viewer = await getCurrentViewer()
   if (!viewer) return null // layout already redirects unauthenticated users
+
+  // Customers get the portal dashboard; staff get the role/permissions view.
+  if (viewer.primaryRole === 'customer') {
+    const data = await getCustomerDashboard()
+    return <CustomerDashboard data={data} name={viewer.fullName} />
+  }
 
   // Group "resource.action" strings by resource for a readable summary.
   const grouped = viewer.permissions.reduce<Record<string, string[]>>((acc, perm) => {

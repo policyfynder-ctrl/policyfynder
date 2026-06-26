@@ -78,6 +78,70 @@ export type Database = {
           },
         ]
       }
+      appointment_change_requests: {
+        Row: {
+          appointment_id: string
+          created_at: string
+          id: string
+          preferred_date: string | null
+          preferred_time: string | null
+          reason: string | null
+          requested_by: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          type: string
+        }
+        Insert: {
+          appointment_id: string
+          created_at?: string
+          id?: string
+          preferred_date?: string | null
+          preferred_time?: string | null
+          reason?: string | null
+          requested_by?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          type: string
+        }
+        Update: {
+          appointment_id?: string
+          created_at?: string
+          id?: string
+          preferred_date?: string | null
+          preferred_time?: string | null
+          reason?: string | null
+          requested_by?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_change_requests_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_change_requests_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_change_requests_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           appointment_date: string
@@ -1617,6 +1681,14 @@ export type Database = {
       get_accessible_branch_ids: { Args: never; Returns: string[] }
       get_accessible_rm_ids: { Args: never; Returns: string[] }
       get_accessible_team_ids: { Args: never; Returns: string[] }
+      get_customer_rm: {
+        Args: never
+        Returns: {
+          email: string
+          phone: string
+          rm_name: string
+        }[]
+      }
       get_rm_id: { Args: never; Returns: string }
       get_slot_availability: {
         Args: { p_branch_id?: string; p_date: string; p_start_time: string }
@@ -1633,6 +1705,10 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_rm: { Args: never; Returns: boolean }
+      link_customer_account: {
+        Args: { p_email: string; p_profile_id: string }
+        Returns: undefined
+      }
       log_system_activity: {
         Args: {
           p_action: string

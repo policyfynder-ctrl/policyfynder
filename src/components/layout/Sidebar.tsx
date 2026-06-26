@@ -6,8 +6,8 @@ import { NavLink } from './NavLink'
 // get_user_permissions) and renders only the nav items those permissions allow,
 // via buildNavItems(). Permissions the user lacks are never rendered — the menu
 // itself is the first layer of the navigation guard.
-export function Sidebar({ permissions }: { permissions: string[] }) {
-  const items = buildNavItems(new Set(permissions))
+export function Sidebar({ permissions, role }: { permissions: string[]; role?: string | null }) {
+  const items = buildNavItems(new Set(permissions), role)
 
   return (
     <aside className="border-border bg-background hidden w-60 shrink-0 border-r md:flex md:flex-col">

@@ -1,12 +1,14 @@
 import { getMyProfile } from '@/services/portal'
+import { getMyPreferences } from '@/services/preferences'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { ProfileForm } from '@/components/features/portal/ProfileForm'
 import { ChangePasswordForm } from '@/components/features/portal/ChangePasswordForm'
+import { CommunicationPreferences } from '@/components/features/portal/CommunicationPreferences'
 
 export const metadata = { title: 'Profile — PolicyFynder' }
 
 export default async function ProfilePage() {
-  const profile = await getMyProfile()
+  const [profile, prefs] = await Promise.all([getMyProfile(), getMyPreferences()])
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -35,6 +37,8 @@ export default async function ProfilePage() {
           <ChangePasswordForm />
         </CardContent>
       </Card>
+
+      <CommunicationPreferences prefs={prefs} />
     </div>
   )
 }

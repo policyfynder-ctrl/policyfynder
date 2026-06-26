@@ -260,6 +260,30 @@ export type Database = {
         }
         Relationships: []
       }
+      insurers: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
       lead_assignments: {
         Row: {
           assigned_at: string
@@ -798,6 +822,153 @@ export type Database = {
           resource?: string
         }
         Relationships: []
+      }
+      policies: {
+        Row: {
+          appointment_id: string | null
+          assigned_rm_id: string | null
+          branch_id: string | null
+          created_at: string
+          customer_profile_id: string | null
+          deleted_at: string | null
+          expiry_date: string | null
+          holder_email: string | null
+          holder_name: string
+          holder_phone: string | null
+          id: string
+          insurer_id: string
+          issue_date: string | null
+          last_contacted_at: string | null
+          lead_id: string | null
+          metadata: Json
+          notes: string | null
+          policy_number: string
+          policy_type: string | null
+          premium_cents: number | null
+          product_id: string
+          renewal_completed_at: string | null
+          renewal_date: string | null
+          start_date: string | null
+          status: Database["public"]["Enums"]["policy_status"]
+          sum_assured_cents: number | null
+          updated_at: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          assigned_rm_id?: string | null
+          branch_id?: string | null
+          created_at?: string
+          customer_profile_id?: string | null
+          deleted_at?: string | null
+          expiry_date?: string | null
+          holder_email?: string | null
+          holder_name: string
+          holder_phone?: string | null
+          id?: string
+          insurer_id: string
+          issue_date?: string | null
+          last_contacted_at?: string | null
+          lead_id?: string | null
+          metadata?: Json
+          notes?: string | null
+          policy_number: string
+          policy_type?: string | null
+          premium_cents?: number | null
+          product_id: string
+          renewal_completed_at?: string | null
+          renewal_date?: string | null
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["policy_status"]
+          sum_assured_cents?: number | null
+          updated_at?: string
+        }
+        Update: {
+          appointment_id?: string | null
+          assigned_rm_id?: string | null
+          branch_id?: string | null
+          created_at?: string
+          customer_profile_id?: string | null
+          deleted_at?: string | null
+          expiry_date?: string | null
+          holder_email?: string | null
+          holder_name?: string
+          holder_phone?: string | null
+          id?: string
+          insurer_id?: string
+          issue_date?: string | null
+          last_contacted_at?: string | null
+          lead_id?: string | null
+          metadata?: Json
+          notes?: string | null
+          policy_number?: string
+          policy_type?: string | null
+          premium_cents?: number | null
+          product_id?: string
+          renewal_completed_at?: string | null
+          renewal_date?: string | null
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["policy_status"]
+          sum_assured_cents?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "policies_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "policies_assigned_rm_id_fkey"
+            columns: ["assigned_rm_id"]
+            isOneToOne: false
+            referencedRelation: "relationship_managers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "policies_assigned_rm_id_fkey"
+            columns: ["assigned_rm_id"]
+            isOneToOne: false
+            referencedRelation: "v_staff_directory"
+            referencedColumns: ["rm_id"]
+          },
+          {
+            foreignKeyName: "policies_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "policies_customer_profile_id_fkey"
+            columns: ["customer_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "policies_insurer_id_fkey"
+            columns: ["insurer_id"]
+            isOneToOne: false
+            referencedRelation: "insurers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "policies_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "policies_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -1429,6 +1600,7 @@ export type Database = {
         | "lead_assigned"
         | "lead_updated"
         | "follow_up"
+      policy_status: "draft" | "active" | "lapsed" | "cancelled" | "expired"
       user_role: "admin" | "rm" | "customer"
     }
     CompositeTypes: {
@@ -1604,6 +1776,7 @@ export const Constants = {
         "lead_updated",
         "follow_up",
       ],
+      policy_status: ["draft", "active", "lapsed", "cancelled", "expired"],
       user_role: ["admin", "rm", "customer"],
     },
   },

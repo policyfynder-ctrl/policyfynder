@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { RoleBadge } from '@/components/layout/RoleBadge'
 import { UpcomingAppointments } from '@/components/features/dashboard/UpcomingAppointments'
+import { PolicyStats } from '@/components/features/dashboard/PolicyStats'
 import { roleLabel } from '@/lib/roles'
 
 export const metadata = { title: 'Dashboard — PolicyFynder' }
@@ -100,6 +101,8 @@ export default async function DashboardPage() {
       </div>
 
       <UpcomingAppointments />
+
+      {viewer.permissions.some((p) => p.startsWith('policies.view_')) && <PolicyStats />}
     </div>
   )
 }

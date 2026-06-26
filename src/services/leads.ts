@@ -90,6 +90,46 @@ export async function getLead(id: string): Promise<LeadDetail | null> {
   return lead
 }
 
+/** Lightweight lead options for "select existing customer" dropdowns (RLS-scoped). */
+export async function listLeadOptions(): Promise<{ id: string; label: string }[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('leads')
+    .select('id, first_name, last_name, email')
+    .is('deleted_at', null)
+    .order('created_at', { ascending: false })
+    .limit(200)
+  if (error) return []
+  return (data ?? []).map((l) => ({
+    id: l.id as string,
+    label: `${l.first_name} ${l.last_name} · ${l.email}`,
+  }))
+}
+
+export type LeadCore = {
+  id: string
+  first_name: string
+  last_name: string
+  email: string
+  phone: string
+  branch_id: string | null
+  customer_profile_id: string | null
+  assigned_rm_id: string | null
+}
+
+/** Core lead fields used to pre-fill a new policy (RLS-scoped). */
+export async function getLeadCore(id: string): Promise<LeadCore | null> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('leads')
+    .select('id, first_name, last_name, email, phone, branch_id, customer_profile_id, assigned_rm_id')
+    .eq('id', id)
+    .is('deleted_at', null)
+    .maybeSingle()
+  if (error || !data) return null
+  return data as LeadCore
+}
+
 export type UpdateStatusResult = { ok: true; status: LeadStatus } | { ok: false; error: string }
 
 /**

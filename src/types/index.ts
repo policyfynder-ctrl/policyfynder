@@ -43,6 +43,10 @@ export type AssignmentMethod =
   | 'geographic'
   | 'system'
 
+// Policy module (migration 020). PolicyFynder tracks the policy lifecycle, not
+// payments — there is no payment-frequency / billing model.
+export type PolicyStatus = 'draft' | 'active' | 'lapsed' | 'cancelled' | 'expired'
+
 export type NoteType = 'general' | 'call' | 'meeting' | 'follow_up' | 'internal'
 
 // morning and afternoon are deprecated — use custom with explicit start_time/end_time

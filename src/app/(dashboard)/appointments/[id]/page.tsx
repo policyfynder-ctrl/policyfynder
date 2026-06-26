@@ -9,6 +9,7 @@ import { AppointmentStatusForm } from '@/components/features/appointments/Appoin
 import { CancelForm } from '@/components/features/appointments/CancelForm'
 import { RescheduleForm } from '@/components/features/appointments/RescheduleForm'
 import { AppointmentTimeline } from '@/components/features/appointments/AppointmentTimeline'
+import { AppointmentRequestsPanel } from '@/components/features/appointments/AppointmentRequestsPanel'
 
 export const metadata = { title: 'Appointment — PolicyFynder' }
 
@@ -111,6 +112,8 @@ export default async function AppointmentDetailPage({
           </CardContent>
         </Card>
       </div>
+
+      {canUpdate && <AppointmentRequestsPanel appointmentId={appt.id} />}
 
       {canUpdate && !isClosed && (
         <div className="grid gap-6 md:grid-cols-2">

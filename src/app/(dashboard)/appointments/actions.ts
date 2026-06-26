@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { updateAppointmentStatus, rescheduleAppointment } from '@/services/appointments'
+import { resolveChangeRequest } from '@/services/changeRequests'
 import { isAppointmentStatus } from '@/lib/appointments'
 
 export type ApptActionState = { error?: string; success?: string } | undefined
@@ -58,4 +59,15 @@ export async function rescheduleAppointmentAction(
   if (!result.ok) return { error: result.error }
   revalidate(id)
   return { success: 'Appointment rescheduled.' }
+}
+
+// RM/manager resolves a customer change request. Approving a cancel also cancels
+// the appointment; RLS gates whether the caller may resolve it.
+export async function resolveRequestAction(fd: FormData): Promise<void> {
+  const requestId = String(fd.get('request_id') ?? '')
+  const apptId = String(fd.get('appointment_id') ?? '')
+  const decision = String(fd.get('decision') ?? '')
+  if (!requestId || (decision !== 'approved' && decision !== 'declined')) return
+  await resolveChangeRequest(requestId, decision)
+  if (apptId) revalidate(apptId)
 }

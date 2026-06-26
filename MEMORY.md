@@ -1,9 +1,9 @@
 # PolicyFynder — Project Handoff
 
 **Last updated:** 2026-06-26
-**Phase:** Milestones 1–10 COMPLETE (built, verified local+cloud, committed, pushed). **Cloud + local at migration parity: 024.** On branch `milestone-10`. Next milestone: TBD.
+**Phase:** Milestones 1–11 COMPLETE (built, verified local+cloud, committed, pushed). **Cloud + local at migration parity: 025.** On branch `milestone-11`. Next milestone: TBD.
 
-**Open PRs (stacked, merge bottom-up 5→6→7→8→9→10):** [#2](https://github.com/policyfynder-ctrl/policyfynder/pull/2) 5→main · [#3](https://github.com/policyfynder-ctrl/policyfynder/pull/3) 6→5 · [#1](https://github.com/policyfynder-ctrl/policyfynder/pull/1) 7→6 · [#4](https://github.com/policyfynder-ctrl/policyfynder/pull/4) 8→7 · [#5](https://github.com/policyfynder-ctrl/policyfynder/pull/5) 9→8 · #6 10→9. Repo: `github.com/policyfynder-ctrl/policyfynder`.
+**Open PRs (stacked, merge bottom-up 5→6→7→8→9→10→11):** [#2](https://github.com/policyfynder-ctrl/policyfynder/pull/2) 5→main · [#3](https://github.com/policyfynder-ctrl/policyfynder/pull/3) 6→5 · [#1](https://github.com/policyfynder-ctrl/policyfynder/pull/1) 7→6 · [#4](https://github.com/policyfynder-ctrl/policyfynder/pull/4) 8→7 · [#5](https://github.com/policyfynder-ctrl/policyfynder/pull/5) 9→8 · [#6](https://github.com/policyfynder-ctrl/policyfynder/pull/6) 10→9 · #7 11→10. Repo: `github.com/policyfynder-ctrl/policyfynder`.
 
 **Cloud test data note:** Cloud test data has been cleaned up. The disposable cloudtest@example.com lead, appointment, and related activity logs were deleted after Milestone 10 verification. The seeded RM (cloud_rm@policyfynder.test) and its schedules remain as permanent seed data.
 
@@ -12,6 +12,16 @@
 Run cloud queries from the Mac (host) or REST — the direct DB host is IPv6-only (unreachable from colima containers). Local DB: `docker exec -i supabase_db_CRM psql -U postgres -d postgres -c "..."` (no psql on host).
 
 **Standing workflow (user-enforced every milestone):** investigate schema/RLS first → present migrations → WAIT for approval → apply LOCAL → build → verify LOCAL → STOP for approval before cloud push → STOP for separate approval before commit/push. Never push cloud or commit without explicit go-ahead.
+
+---
+
+## Milestone 11 — Customer Portal (COMPLETE — local+cloud+committed, 2026-06-26)
+
+Migration 025 on cloud (verified 9/9 e2e). Committed + pushed `milestone-11`; PR #7 (base milestone-10). Reuses the `(dashboard)` shell + auth + RLS — customers access ONLY their own data; no admin bypass. **Two pre-existing security holes fixed:** (1) privilege escalation — `user_own_profile_update` had no column guard and `is_admin()` reads `profiles.role`, so a customer could self-promote to admin; (2) customers could directly mutate appointments.
+
+**Migration 025 `customer_portal`:** `link_customer_account(profile_id,email)` SECURITY DEFINER links unlinked leads/policies by confirmed email; `handle_new_auth_user` extended to call it on signup + one-time backfill; `idx_policies_holder_email`. `protect_profile_columns` BEFORE UPDATE trigger (NOT security definer — uses current_user) blocks `role`/`email` change by authenticated non-admins, while service_role/postgres still can. `get_customer_rm()` returns the caller's RM contact scoped to their policies. `appointment_change_requests` table (cancel/reschedule, status pending/approved/declined) + RLS (customer insert/select own; RM/manager select+update scoped) + audit triggers (`appointment.change_requested`/`change_approved`/`change_declined`). **Dropped `customer_own_appointment_update`** — customer changes go through requests only.
+
+**App (reuses (dashboard) shell):** `src/services/portal.ts` (dashboard, my-policies+detail+history, renewals, appointments, notifications, profile, updateMyProfile, getMyRm) + `changeRequests.ts` (create/list/resolve). Change-password reuses `auth.updatePassword`. Pages: `/dashboard` is role-aware (customer → `CustomerDashboard`); `/dashboard/my-policies` (+`[id]`), `/dashboard/my-renewals`, `/dashboard/my-appointments` (cancel/reschedule request forms), `/dashboard/notifications`, `/dashboard/profile`. Staff side: `AppointmentRequestsPanel` (approve/decline) on appointment detail; `resolveRequestAction` (approve-cancel also cancels the appointment). `buildNavItems(perms, role)` renders customer nav when `role='customer'` (Sidebar/layout pass `viewer.primaryRole`). No new permissions (customers already have the `view_own` set).
 
 ---
 
@@ -255,11 +265,12 @@ Running via **colima** (not Docker Desktop) + Supabase CLI 2.107.0.
 **Date:** 2026-06-26
 **What was built:**
 
-- **Milestone 10 (Reports & Analytics)** finished end-to-end: migration 024 (12 scoped `SECURITY DEFINER` reporting functions + 3 indexes) applied local + cloud; `src/services/reports.ts`, `/dashboard/reports` page (date-range + role-gated sections), report components. Nav Reports entry pre-existing.
-- Verified local (scope: RM-own / branch-confined / admin-all) and cloud (7/7 e2e). Committed `Milestone 10 - Reports and Analytics`, pushed `milestone-10`, PR #6 (base milestone-9, NOT merged).
+- **Milestone 11 (Customer Portal)** finished end-to-end: migration 025 (email linking + handle_new_auth_user extension + backfill; profile role/email-escalation guard trigger; get_customer_rm; appointment_change_requests table+RLS+audit; dropped customer_own_appointment_update; holder_email index) applied local + cloud. Portal services + customer pages (dashboard, my-policies, renewals, appointments w/ change requests, notifications, profile) + staff request-resolution panel + customer nav.
+- Fixed two pre-existing security holes (customer role self-escalation; customer direct appointment mutation).
+- Verified local (9/9) and cloud (9/9 e2e). Committed `Milestone 11 - Customer Portal`, pushed `milestone-11`, PR #7 (base milestone-10, NOT merged).
 
-**Stopped at:** M10 complete and on cloud; all 6 milestone PRs (#1–#6) open and unmerged.
-**Next action:** Await next milestone scope from the user (or merge the PR stack 5→6→7→8→9→10).
+**Stopped at:** M11 complete and on cloud; all 7 milestone PRs (#1–#7) open and unmerged.
+**Next action:** Await next milestone scope from the user (or merge the PR stack 5→6→7→8→9→10→11).
 
 ---
 

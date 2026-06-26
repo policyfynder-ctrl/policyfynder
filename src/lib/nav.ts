@@ -5,8 +5,20 @@ export interface NavItem {
 
 // Builds the sidebar navigation from the current user's permission set.
 // Permission strings are formatted as "resource.action" (e.g. "leads.view_assigned").
-// Never hardcode role names here — use permissions only.
-export function buildNavItems(perms: Set<string>): NavItem[] {
+// Staff items are permission-driven; the customer portal is a distinct surface, so
+// customer items are gated on the customer role.
+export function buildNavItems(perms: Set<string>, role?: string | null): NavItem[] {
+  if (role === 'customer') {
+    return [
+      { label: 'Dashboard', href: '/dashboard' },
+      { label: 'My Policies', href: '/dashboard/my-policies' },
+      { label: 'Renewals', href: '/dashboard/my-renewals' },
+      { label: 'My Appointments', href: '/dashboard/my-appointments' },
+      { label: 'Notifications', href: '/dashboard/notifications' },
+      { label: 'Profile', href: '/dashboard/profile' },
+    ]
+  }
+
   const canViewLeads =
     perms.has('leads.view_assigned') ||
     perms.has('leads.view_team') ||

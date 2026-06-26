@@ -862,23 +862,25 @@ No schema changes needed — capacity scales automatically with RM count.
 
 All 11 migration files in `supabase/migrations/`. Run in order.
 
-| File                                        | Group         | Contents                                                                                                  |
-| ------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------- |
-| `20260625000001_initial_schema.sql`         | Foundation    | Enums, 14 tables, all triggers and DB functions, v_slot_availability, seeds                               |
-| `20260625000002_rls_policies.sql`           | Foundation    | Base RLS — is_admin(), is_rm(), get_rm_id() helpers + all base policies                                   |
-| `20260625000003_indexes.sql`                | Foundation    | Core performance indexes                                                                                  |
-| `20260625000004_role_system.sql`            | RBAC          | roles, permissions, role_permissions, user_roles; seeded roles + permission matrix                        |
-| `20260625000005_org_structure.sql`          | Org           | teams, team_members; team_id on rms; branch_id on leads/appointments                                      |
-| `20260625000006_capacity_config.sql`        | Capacity      | working_hours_config, branch_holidays; config-driven v_slot_availability; branch-aware capacity functions |
-| `20260625000007_lead_enhancements.sql`      | CRM           | lead_sources, lead_follow_ups; new lead columns; remove appointment_in_future constraint                  |
-| `20260625000008_notification_templates.sql` | Notifications | notification_templates; retry columns on notifications                                                    |
-| `20260625000009_rls_v2.sql`                 | RBAC          | has_permission(), get_accessible_branch_ids(), get_accessible_rm_ids(); hierarchy-aware policies          |
-| `20260625000010_indexes_v2.sql`             | Performance   | Indexes for all new tables and columns                                                                    |
-| `20260625000011_activity_triggers.sql`      | Audit         | 6 DB triggers auto-populating activity_logs                                                               |
-| `20260625000012_get_user_permissions.sql`   | RBAC          | get_user_permissions() → text[] of "resource.action" for auth.uid(); powers the role-aware sidebar        |
-| `20260625000013_api_grants.sql`             | Access        | Explicit GRANTs to anon/authenticated/service_role (+ default privileges); RLS still gates rows           |
-| `20260625000014_fix_capacity_trigger.sql`   | Capacity      | Fix ambiguous 2-arg/3-arg capacity overloads; capacity trigger now branch-aware; drop 2-arg overloads     |
-| `20260625000015_lead_status_activity.sql`   | Audit         | Trigger logs lead.status_changed to activity_logs on every status transition                              |
+| File                                        | Group         | Contents                                                                                                    |
+| ------------------------------------------- | ------------- | ----------------------------------------------------------------------------------------------------------- |
+| `20260625000001_initial_schema.sql`         | Foundation    | Enums, 14 tables, all triggers and DB functions, v_slot_availability, seeds                                 |
+| `20260625000002_rls_policies.sql`           | Foundation    | Base RLS — is_admin(), is_rm(), get_rm_id() helpers + all base policies                                     |
+| `20260625000003_indexes.sql`                | Foundation    | Core performance indexes                                                                                    |
+| `20260625000004_role_system.sql`            | RBAC          | roles, permissions, role_permissions, user_roles; seeded roles + permission matrix                          |
+| `20260625000005_org_structure.sql`          | Org           | teams, team_members; team_id on rms; branch_id on leads/appointments                                        |
+| `20260625000006_capacity_config.sql`        | Capacity      | working_hours_config, branch_holidays; config-driven v_slot_availability; branch-aware capacity functions   |
+| `20260625000007_lead_enhancements.sql`      | CRM           | lead_sources, lead_follow_ups; new lead columns; remove appointment_in_future constraint                    |
+| `20260625000008_notification_templates.sql` | Notifications | notification_templates; retry columns on notifications                                                      |
+| `20260625000009_rls_v2.sql`                 | RBAC          | has_permission(), get_accessible_branch_ids(), get_accessible_rm_ids(); hierarchy-aware policies            |
+| `20260625000010_indexes_v2.sql`             | Performance   | Indexes for all new tables and columns                                                                      |
+| `20260625000011_activity_triggers.sql`      | Audit         | 6 DB triggers auto-populating activity_logs                                                                 |
+| `20260625000012_get_user_permissions.sql`   | RBAC          | get_user_permissions() → text[] of "resource.action" for auth.uid(); powers the role-aware sidebar          |
+| `20260625000013_api_grants.sql`             | Access        | Explicit GRANTs to anon/authenticated/service_role (+ default privileges); RLS still gates rows             |
+| `20260625000014_fix_capacity_trigger.sql`   | Capacity      | Fix ambiguous 2-arg/3-arg capacity overloads; capacity trigger now branch-aware; drop 2-arg overloads       |
+| `20260625000015_lead_status_activity.sql`   | Audit         | Trigger logs lead.status_changed to activity_logs on every status transition                                |
+| `20260625000016_appointment_audit.sql`      | Audit/Access  | Scoped activity_logs SELECT (appointment/lead owners, not just admins); specific appointment.\* log actions |
+| `20260625000017_capacity_update_guard.sql`  | Capacity      | Capacity trigger skips status/notes-only updates (was blocking confirm/complete by counting the row itself) |
 
 ```bash
 # Apply all migrations locally

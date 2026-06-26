@@ -718,6 +718,7 @@ export type Database = {
           max_retries: number
           next_retry_at: string | null
           payload: Json
+          policy_id: string | null
           provider_message_id: string | null
           recipient_id: string
           retry_count: number
@@ -738,6 +739,7 @@ export type Database = {
           max_retries?: number
           next_retry_at?: string | null
           payload?: Json
+          policy_id?: string | null
           provider_message_id?: string | null
           recipient_id: string
           retry_count?: number
@@ -758,6 +760,7 @@ export type Database = {
           max_retries?: number
           next_retry_at?: string | null
           payload?: Json
+          policy_id?: string | null
           provider_message_id?: string | null
           recipient_id?: string
           retry_count?: number
@@ -781,6 +784,13 @@ export type Database = {
             columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "policies"
             referencedColumns: ["id"]
           },
           {
@@ -1276,6 +1286,76 @@ export type Database = {
         }
         Relationships: []
       }
+      tasks: {
+        Row: {
+          assigned_rm_id: string | null
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          due_at: string | null
+          entity_id: string | null
+          entity_type: string
+          id: string
+          kind: string
+          note: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_rm_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          due_at?: string | null
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          kind?: string
+          note?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_rm_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          due_at?: string | null
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          kind?: string
+          note?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_assigned_rm_id_fkey"
+            columns: ["assigned_rm_id"]
+            isOneToOne: false
+            referencedRelation: "relationship_managers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_assigned_rm_id_fkey"
+            columns: ["assigned_rm_id"]
+            isOneToOne: false
+            referencedRelation: "v_staff_directory"
+            referencedColumns: ["rm_id"]
+          },
+          {
+            foreignKeyName: "tasks_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_members: {
         Row: {
           id: string
@@ -1530,6 +1610,10 @@ export type Database = {
       }
     }
     Functions: {
+      generate_renewal_reminders: {
+        Args: { p_days_ahead?: number }
+        Returns: number
+      }
       get_accessible_branch_ids: { Args: never; Returns: string[] }
       get_accessible_rm_ids: { Args: never; Returns: string[] }
       get_accessible_team_ids: { Args: never; Returns: string[] }
@@ -1600,6 +1684,8 @@ export type Database = {
         | "lead_assigned"
         | "lead_updated"
         | "follow_up"
+        | "policy_renewal_reminder"
+        | "policy_renewal_overdue"
       policy_status: "draft" | "active" | "lapsed" | "cancelled" | "expired"
       user_role: "admin" | "rm" | "customer"
     }
@@ -1775,6 +1861,8 @@ export const Constants = {
         "lead_assigned",
         "lead_updated",
         "follow_up",
+        "policy_renewal_reminder",
+        "policy_renewal_overdue",
       ],
       policy_status: ["draft", "active", "lapsed", "cancelled", "expired"],
       user_role: ["admin", "rm", "customer"],

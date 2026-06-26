@@ -25,6 +25,12 @@ export function buildNavItems(perms: Set<string>): NavItem[] {
     perms.has('policies.view_branch') ||
     perms.has('policies.view_all')
 
+  const canViewTasks =
+    perms.has('tasks.view_assigned') ||
+    perms.has('tasks.view_team') ||
+    perms.has('tasks.view_branch') ||
+    perms.has('tasks.view_all')
+
   const canViewReports =
     perms.has('reports.view_own') ||
     perms.has('reports.view_team') ||
@@ -56,6 +62,16 @@ export function buildNavItems(perms: Set<string>): NavItem[] {
       label: 'Policies',
       href: '/dashboard/policies',
       show: canViewPolicies,
+    },
+    {
+      label: 'Renewals',
+      href: '/dashboard/renewals',
+      show: canViewPolicies || perms.has('renewals.manage'),
+    },
+    {
+      label: 'Tasks',
+      href: '/dashboard/tasks',
+      show: canViewTasks,
     },
     {
       label: 'Reports',

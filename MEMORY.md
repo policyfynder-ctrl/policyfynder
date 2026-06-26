@@ -1,7 +1,53 @@
 # PolicyFynder — Project Handoff
 
-**Last updated:** 2026-06-25
-**Phase:** Milestone 7 (RM & Team Management) built + verified on LOCAL (branch `milestone-7`). Migrations 018+019 applied LOCAL ONLY — ⚠️ NOT yet on cloud (awaiting approval). Cloud at migration 017. Not committed to git yet.
+**Last updated:** 2026-06-26
+**Phase:** Milestones 1–9 COMPLETE (built, verified local+cloud, committed, pushed). **Cloud + local at migration parity: 023.** On branch `milestone-9`. Next milestone: TBD.
+
+**Open PRs (stacked, merge bottom-up 5→6→7→8→9):** [#2](https://github.com/policyfynder-ctrl/policyfynder/pull/2) milestone-5→main · [#3](https://github.com/policyfynder-ctrl/policyfynder/pull/3) 6→5 · [#1](https://github.com/policyfynder-ctrl/policyfynder/pull/1) 7→6 · [#4](https://github.com/policyfynder-ctrl/policyfynder/pull/4) 8→7 · #5 9→8. Repo: `github.com/policyfynder-ctrl/policyfynder`.
+
+**Cloud push command** (CLI not linked; password URL-encoded @→%40 #→%23 %→%25):
+`echo y | supabase db push --db-url "postgresql://postgres:Ka03%4054962%234%25@db.hbdepkvjnvrmezdjvykh.supabase.co:5432/postgres"`
+Run cloud queries from the Mac (host) or REST — the direct DB host is IPv6-only (unreachable from colima containers). Local DB: `docker exec -i supabase_db_CRM psql -U postgres -d postgres -c "..."` (no psql on host).
+
+**Standing workflow (user-enforced every milestone):** investigate schema/RLS first → present migrations → WAIT for approval → apply LOCAL → build → verify LOCAL → STOP for approval before cloud push → STOP for separate approval before commit/push. Never push cloud or commit without explicit go-ahead.
+
+---
+
+## Milestone 9 — Renewals & Reminders automation (COMPLETE — local+cloud+committed, 2026-06-26)
+
+Migrations 022+023 on cloud (verified 8/8 e2e: generates 1 task + 1 in-app notification, idempotent re-run = 0 dups, queue-only no email/WhatsApp/SMS, task RLS scope RM-own/unrelated-0/branch-manager). Committed + pushed `milestone-9`; PR #5 (base milestone-8). App: services `tasks.ts` (list/create/complete), `notifications.ts` (pending renewal reminders), `policies.listRenewals(window)`; admin API `POST /api/admin/renewals` (session + `renewals.manage` → service-role calls the function); pages `/dashboard/renewals` (30/60/90/overdue windows; row actions log-contact/create-task/mark-renewed; `renewals.manage`-gated Generate button) + `/dashboard/tasks` (open/completed + Complete); components in `features/renewals` + `features/tasks`; nav Renewals + Tasks.
+
+**Scope chosen by user.** Build on M8 policy renewal fields. Decisions locked:
+- **Scheduling:** a `generate_renewal_reminders()` SECURITY DEFINER function invoked by a service-role admin API route (`/api/admin/renewals/generate`), pg_cron-ready. No edge functions.
+- **Delivery:** QUEUE ONLY — generate task + in-app notification rows. NO email/WhatsApp/SMS/provider integration.
+- **Tasks:** a GENERIC `tasks` table (leads/policies/appointments/general), not a policy-specific mirror. (Existing `lead_follow_ups` is unused/nav-only — left as legacy, not refactored.)
+
+**Migration files WRITTEN (on disk, NOT applied):**
+- `supabase/migrations/20260625000022_notifications_policy_link.sql` — `ALTER TYPE notification_type ADD VALUE 'policy_renewal_reminder' / 'policy_renewal_overdue'`; `notifications.policy_id` FK + index. (Enum values in their own file — can't ADD+USE a value in one txn.)
+- `supabase/migrations/20260625000023_renewals_automation.sql` — `tasks` table (+RLS scoped by assigned_rm/get_accessible_rm_ids, +grants, +indexes incl. `idx_tasks_open_renewal`); replaces notifications recipient-only SELECT with `notifications_select_scoped` (recipient OR policy/lead in scope); `generate_renewal_reminders(p_days_ahead INT DEFAULT 30)`; task audit triggers (`task.created`/`task.completed`) + `activity_logs_select_scoped` extended to include `task`; permissions (`tasks.*` + `renewals.manage`) mapped to roles.
+
+**`generate_renewal_reminders()` contract (user-specified):** for each active policy due to renew within N days (renewal_completed_at IS NULL, has assigned RM):
+- **(1) MANDATORY task** — entity_type='policy', entity_id=policy_id, kind='renewal', assigned_rm_id=policy.assigned_rm_id, title='Policy renewal due', due_at=renewal_date::timestamptz, completed_at NULL, note=`Renewal due on <date> for policy <number>`.
+- **(2) OPTIONAL in-app notification** — type 'policy_renewal_reminder', channel 'in_app', status 'pending'.
+- **Idempotent:** skip if an OPEN renewal task already exists for the policy; skip if a pending/sent/delivered renewal notification already exists. Returns count of TASKS created.
+
+**NEXT SESSION — M9 build (after applying migrations):**
+1. `supabase db reset` (applies 022+023) → `supabase gen types typescript --local > src/types/database.ts`.
+2. Services: `src/services/tasks.ts` (list scoped, create, complete), `src/services/notifications.ts` (list own/scoped). Reuse `staffNameMap` for RM names.
+3. Admin API: `src/app/api/admin/renewals/route.ts` (POST; verify session + `renewals.manage`; service-role calls `generate_renewal_reminders`). Mirror `/api/admin/rms` auth pattern.
+4. Pages: `/dashboard/renewals` (policies due to renew — filters 30/60/90 + overdue; row actions: log contact → policies.update last_contacted_at, create task, mark renewed → renewal_completed_at). `/dashboard/tasks` (RM task queue: open/completed, complete action). Add a "Generate renewal reminders" button gated by `renewals.manage`.
+5. Nav (`src/lib/nav.ts`): add **Tasks** (`tasks.view_*`) and **Renewals** (`renewals.manage` or `policies.view_*`). Add types to `src/types/index.ts`.
+6. Verify LOCAL: typecheck/lint/build; RLS harness (task scope per role; generate function creates task+notification, is idempotent on 2nd run — 0 new; audit task.created/completed). THEN stop for cloud-push approval, then commit/PR (base milestone-8) approval.
+
+---
+
+## Milestone 8 — Policy Management (COMPLETE — local+cloud+committed, 2026-06-26)
+
+Committed `f121645` on `milestone-8`, pushed; [PR #4](https://github.com/policyfynder-ctrl/policyfynder/pull/4) (base milestone-7). Migrations 020+021 on cloud (verified 9/9 e2e). **PolicyFynder tracks the policy LIFECYCLE, not payments** (no payment_frequency/billing; premium/sum_assured are reference-only).
+
+**Migration 020 `policy_management`:** `insurers` table (6 seeded carriers) + `policies` table. policy_number = insurer's real number (required, unique, user-entered — never generated). Cols: customer_profile_id/lead_id/appointment_id/product_id/insurer_id/assigned_rm_id/branch_id; denormalized holder_name/email/phone (mirrors leads — avoids self+admin profiles RLS); premium_cents/sum_assured_cents (BIGINT, reference); status enum (draft/active/lapsed/cancelled/expired); issue/start/expiry/renewal_date; **renewal_completed_at**, **last_contacted_at** (lifecycle/follow-up). RLS = base (is_admin/is_rm/get_rm_id) + hierarchy (get_accessible_*) + scoped insert. Audit triggers: policy.created/updated/deleted/assigned/status_changed; `activity_logs_select_scoped` extended for 'policy'. **Migration 021 `policy_permissions`:** `policies` resource (9 actions) mapped to roles.
+
+**App:** services `policies.ts` (list+filters+pagination, getPolicy, create/update/softDelete, getPolicyDashboard, listAssignableRms, currentRmId), `insurers.ts`, `products.ts` (+ `leads.ts` getLeadCore/listLeadOptions). RM names via `v_staff_directory` (M7). Pages `/dashboard/policies` (search + status/insurer/product/expiry filters + pagination), `[id]` (detail + activity timeline + edit + soft-delete), `new`. Components in `features/policies/`. Dashboard widget `PolicyStats`: **Active, Expiring, Renewals Due, Renewals Completed, Recently Added** (all RLS-scoped). Nav: Policies gated by `policies.view_*`. Pure helpers `src/lib/policies.ts`.
 
 ---
 
@@ -21,7 +67,7 @@
 
 **Verified on LOCAL:** branch manager can update an RM, create a team, add a schedule, add a team member, and read RM names (mig 019); a plain RM is denied (RLS violation). All PostgREST embeds resolve. typecheck/lint pass; routes guard (unauth → /login); `/api/admin/rms` returns 401 unauthenticated.
 
-**⚠️ NEXT (needs approval):** push migrations 018+019 to cloud, then re-verify. Cloud currently has 001–017.
+**✅ COMPLETE:** Migration 019 was REVISED to least-privilege before push — replaced the broad profiles SELECT policy with a `v_staff_directory` VIEW (security_invoker=false) exposing ONLY rm_id + full_name, scoped by `get_accessible_rm_ids()`; self-name always resolves (`OR rm.profile_id = auth.uid()`). Services resolve RM names via `staffNameMap()` (`src/services/staff.ts`) reading that view — NOT profiles embeds. Migrations 018+019 on cloud (verified 9/9 e2e). Committed `dbcb0f9`, [PR #1](https://github.com/policyfynder-ctrl/policyfynder/pull/1).
 
 ---
 
@@ -198,42 +244,14 @@ Running via **colima** (not Docker Desktop) + Supabase CLI 2.107.0.
 
 ## Last Session
 
-**Date:** 2026-06-25
+**Date:** 2026-06-26
 **What was built:**
 
-- Architecture review report (19 findings: 6 Critical, 9 Recommended, 4 Future)
-- 8 new migration files (migrations 4–11) addressing all 6 Critical and 8 Recommended findings
-- Updated `src/types/index.ts` with all new interfaces (Role, Team, WorkingHoursConfig, LeadFollowUp, etc.)
-- Full rewrite of all 4 architecture docs (`system-design.md`, `database-schema.md`, `frontend-structure.md`, `backend-structure.md`)
-- Updated `decisions/product-decisions.md` with all new design decisions
+- **Milestone 9 (Renewals & Reminders)** finished end-to-end: applied migrations 022+023 (local + cloud), built tasks + notifications services, `/api/admin/renewals` admin API, `/dashboard/renewals` pipeline + `/dashboard/tasks` queue, nav. `generate_renewal_reminders()` creates a mandatory renewal task + optional in-app notification, idempotent.
+- Verified local (RLS scope, idempotency, audit) and cloud (8/8 e2e). Committed `Milestone 9 - Renewals and Reminders`, pushed `milestone-9`, PR #5 opened (base milestone-8, NOT merged).
 
-**What was decided:**
-
-- Role system: table-based RBAC (`roles`, `permissions`, `role_permissions`, `user_roles`) replaces the 3-value enum approach
-- Org hierarchy: `teams` + `team_members` tables; `team_id` on `relationship_managers`
-- Capacity: `working_hours_config` drives slot generation; capacity functions now branch-aware
-- Leads: `follow_up_at`, `sla_deadline_at`, `priority` added; `lead_sources` table replaces enum
-- Notifications: `notification_templates` table + retry columns on `notifications`
-- RLS v2: `has_permission()`, `get_accessible_branch_ids()`, `get_accessible_rm_ids()` helper functions
-
-**Migration fixes applied (2026-06-25):**
-
-- Migration 001: `branches` now has `code TEXT UNIQUE`; seeded Head Office with `'head-office'`
-- Migration 001: `activity_logs.changes` renamed to `activity_logs.metadata` to match migration 011 triggers
-- Migration 002: `branches` SELECT policy replaced — anonymous users can read `is_active = true` rows; authenticated users can read all rows
-
-**Stopped at:** Milestone 1 complete. All 3 Must Fix items resolved. Local dev environment verified and documented.
-**Next action:** Connect Supabase → fill `.env.local` → apply all 11 migrations → `supabase gen types typescript` → then begin Milestone 2 (auth pages)
-
-**Milestone 1 deliverables (completed 2026-06-25):**
-
-- `src/lib/supabase/admin.ts` — service role client (API routes only)
-- `src/lib/nav.ts` — permission-driven sidebar nav builder
-- `src/app/(public)/book/[branch]/` — directory created for Milestone 4 booking page
-- `supabase/seed.sql` — South Office branch updated with `code = 'south-office'`
-- `docs/local-setup.md` — full local dev setup guide
-- `docs/deployment-checklist.md` — 9-phase deployment checklist
-- `docs/admin-bootstrap.md` — first admin + RM onboarding SQL guide
+**Stopped at:** M9 complete and on cloud; all 5 milestone PRs (#1–#5) open and unmerged.
+**Next action:** Await next milestone scope from the user. (Likely candidates: Reports & Analytics, Notifications delivery worker, or merging the PR stack 5→6→7→8→9.)
 
 ---
 

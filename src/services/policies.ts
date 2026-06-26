@@ -370,6 +370,51 @@ export async function getPolicyDashboard(): Promise<PolicyDashboard> {
   }
 }
 
+export type RenewalRow = {
+  id: string
+  policy_number: string
+  holder_name: string
+  status: PolicyStatus
+  renewal_date: string | null
+  last_contacted_at: string | null
+  insurer: { name: string } | null
+  assigned_rm: { id: string; profile: { full_name: string | null } | null } | null
+}
+
+export type RenewalWindow = '30' | '60' | '90' | 'overdue'
+
+/**
+ * Policies due for renewal (active, not yet renewed), RLS-scoped. Window:
+ *   '30'/'60'/'90' — renewal_date within today..+N days; 'overdue' — renewal_date < today.
+ */
+export async function listRenewals(window: RenewalWindow = '30'): Promise<RenewalRow[]> {
+  const supabase = await createClient()
+  let q = supabase
+    .from('policies')
+    .select(
+      'id, policy_number, holder_name, status, renewal_date, last_contacted_at,' +
+        ' insurer:insurers(name), assigned_rm:relationship_managers(id)'
+    )
+    .is('deleted_at', null)
+    .eq('status', 'active')
+    .is('renewal_completed_at', null)
+    .not('renewal_date', 'is', null)
+
+  if (window === 'overdue') q = q.lt('renewal_date', todayISO())
+  else q = q.gte('renewal_date', todayISO()).lte('renewal_date', addDaysISO(Number(window)))
+
+  q = q.order('renewal_date', { ascending: true })
+
+  const { data, error } = await q
+  if (error) throw error
+  const rows = (data ?? []) as unknown as RenewalRow[]
+  const names = await staffNameMap(rows.map((r) => r.assigned_rm?.id))
+  for (const r of rows) {
+    if (r.assigned_rm) r.assigned_rm.profile = { full_name: names.get(r.assigned_rm.id) ?? null }
+  }
+  return rows
+}
+
 /** RMs the current user may assign a policy to (scoped by the staff directory view). */
 export async function listAssignableRms(): Promise<{ id: string; name: string }[]> {
   const supabase = await createClient()

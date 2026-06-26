@@ -881,6 +881,8 @@ All 11 migration files in `supabase/migrations/`. Run in order.
 | `20260625000015_lead_status_activity.sql`   | Audit         | Trigger logs lead.status_changed to activity_logs on every status transition                                |
 | `20260625000016_appointment_audit.sql`      | Audit/Access  | Scoped activity_logs SELECT (appointment/lead owners, not just admins); specific appointment.\* log actions |
 | `20260625000017_capacity_update_guard.sql`  | Capacity      | Capacity trigger skips status/notes-only updates (was blocking confirm/complete by counting the row itself) |
+| `20260625000018_rm_team_management_rls.sql` | Access        | get_accessible_team_ids(); scoped write policies for rms/rm_schedules/teams/team_members (manage_branch/own) |
+| `20260625000019_profiles_staff_read.sql`    | Access        | rms.view holders can read profiles of RMs in their accessible branches (names for RM/team/lead/appt views)  |
 
 ```bash
 # Apply all migrations locally

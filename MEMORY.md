@@ -1,20 +1,36 @@
 # PolicyFynder — Project Handoff
 
 **Last updated:** 2026-06-27
-**Phase:** Milestones 1–14 COMPLETE + merged to `main`. **`main` is the single source of truth through Milestone 14.** **Cloud + local DB at migration 027 (M14 added NO migrations).** **No open PRs.** Currently on `main`.
+**Phase:** Milestones 1–14 merged to `main`. **Milestone 15 (Production Readiness) built + verified locally on branch `milestone-15`; PR open, NOT merged.** **Cloud + local DB at migration 027 (M15 added NO migrations).** Currently on `milestone-15`.
 
 **Roadmap (next):**
-- **M15 — Production Readiness & Launch (NEXT):** Vercel deployment, env validation, monitoring, backups, security review (incl. rotating the cloud service_role key + DB password exposed earlier), performance review, final UAT, launch checklist.
+- **M15 — Production Readiness:** DONE (local) — see section below; PR open. After merge, the remaining work is OPERATIONAL (rotate keys, configure Vercel/prod Supabase, backups/PITR, monitoring) — see `docs/production/`.
 
-**Git:** PRs #1–#10 all merged to `main` (M14 = PR #10, regular merge commit `526bb85`); milestone branches (5–14) deleted. **No open PRs.** `main` is the single source of truth (Milestones 1–14). Next milestone (M15) starts from a fresh branch off `main`. Repo: `github.com/policyfynder-ctrl/policyfynder`.
+**Git:** PRs #1–#10 merged to `main`; milestone branches (5–14) deleted. **M15 PR (milestone-15 → main) open, NOT merged.** Repo: `github.com/policyfynder-ctrl/policyfynder`.
 
 **Cloud test data note:** Cloud test data has been cleaned up. The disposable cloudtest@example.com lead, appointment, and related activity logs were deleted after Milestone 10 verification. The seeded RM (cloud_rm@policyfynder.test) and its schedules remain as permanent seed data.
 
-**Cloud push command** (CLI not linked; password URL-encoded @→%40 #→%23 %→%25):
-`echo y | supabase db push --db-url "postgresql://postgres:Ka03%4054962%234%25@db.hbdepkvjnvrmezdjvykh.supabase.co:5432/postgres"`
+**Cloud push command** (CLI not linked; password URL-encoded @→%40 #→%23 %→%25). NOTE: the live DB password was scrubbed here in M15 and MUST be rotated (see docs/production/key-rotation.md) — it remains in earlier git history until rotated:
+`echo y | supabase db push --db-url "postgresql://postgres:<urlenc-db-password>@db.hbdepkvjnvrmezdjvykh.supabase.co:5432/postgres"`
 Run cloud queries from the Mac (host) or REST — the direct DB host is IPv6-only (unreachable from colima containers). Local DB: `docker exec -i supabase_db_CRM psql -U postgres -d postgres -c "..."` (no psql on host).
 
 **Standing workflow (user-enforced every milestone):** investigate schema/RLS first → present migrations → WAIT for approval → apply LOCAL → build → verify LOCAL → STOP for approval before cloud push → STOP for separate approval before commit/push. Never push cloud or commit without explicit go-ahead.
+
+---
+
+## Milestone 15 — Production Readiness (BUILT local, PR open — 2026-06-27)
+
+**No migrations.** Branch `milestone-15`, PR base `main` (not merged). Version bumped to **1.0.0**.
+
+**Code/config:** `src/lib/env.ts` (typed env + validateEnv/assertEnv — core vars always required, provider/cron only when `COMMUNICATIONS_DRY_RUN='false'`; wired into the admin client); `next.config.ts` hardened (HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy; `poweredByHeader:false`; compress; `images.remotePatterns`; **no CSP yet — deferred**); `src/lib/appInfo.ts` (APP_VERSION/LATEST_DB_MIGRATION/commit); `/api/health` (`{status,version,commit,migration,timestamp}`, `?db=1` shallow ping); `ProductionBanner` in dashboard footer (only when NODE_ENV=production).
+
+**Tooling:** `npm run production:check` → `scripts/production-check.mjs` (env, build-identity consistency, vercel/cron, security headers, Supabase connectivity, optional health ping). `scripts/e2e-prod-sim.mjs` — 12-step local e2e (landing→book→lead→RM assign→RM login→convert→policy→portal→comms dry-run→reports→renewals→permissions); self-cleans (zz15/E2E15 fixtures).
+
+**Docs:** `docs/production/` (README, deployment, security, key-rotation, backup-recovery, monitoring, launch-checklist); stale `docs/deployment-checklist.md` redirected. `LAUNCH_REPORT.md` at repo root (Go/No-Go evidence).
+
+**Verified local:** typecheck/lint/build (46 static/SSG), `production:check` 0-fail/4-warn, e2e **13/13**, security headers present + X-Powered-By gone, `/api/health` ok. Deferred (post-launch): Sentry, advanced monitoring, CSP tuning, log aggregation, perf analytics.
+
+**Security note:** the live DB password was scrubbed from this file in M15 (placeholder now); it remains in earlier git history until **rotated** (mandatory pre-launch — see `docs/production/key-rotation.md`). Remaining launch actions are OPERATIONAL (human): rotate service_role key + DB password, set Vercel env vars, enable backups/PITR, set uptime monitoring, keep comms dry-run until provider approval.
 
 ---
 

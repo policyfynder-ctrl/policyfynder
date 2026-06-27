@@ -160,6 +160,13 @@ export async function queueMessage(input: {
   return { ok: true, id: data.id }
 }
 
+export type DeliveryLogRow = {
+  status: string
+  attempt: number
+  detail: string | null
+  created_at: string
+}
+
 export type MessageRow = {
   id: string
   channel: string
@@ -167,17 +174,34 @@ export type MessageRow = {
   status: string
   created_at: string
   scheduled_at: string
+  sent_at: string | null
+  provider_message_id: string | null
+  retry_count: number
+  max_retries: number
+  error_message: string | null
   policy: { policy_number: string } | null
+  delivery_logs: DeliveryLogRow[]
 }
 
-/** The communication queue log, RLS-scoped to what the caller can see. */
+/**
+ * The communication queue log, RLS-scoped to what the caller can see. Surfaces
+ * dispatch state (status / provider id / retries / last error) and the per-attempt
+ * delivery_logs trail (M13) so staff can see exactly what the worker did.
+ */
 export async function listMessages(): Promise<MessageRow[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('notifications')
-    .select('id, channel, category, status, created_at, scheduled_at, policy:policies(policy_number)')
+    .select(
+      'id, channel, category, status, created_at, scheduled_at, sent_at, provider_message_id, retry_count, max_retries, error_message, policy:policies(policy_number), delivery_logs(status, attempt, detail, created_at)'
+    )
     .order('created_at', { ascending: false })
     .limit(100)
   if (error) return []
-  return (data ?? []) as unknown as MessageRow[]
+  const rows = (data ?? []) as unknown as MessageRow[]
+  // Order each row's attempts oldest→newest for a readable timeline.
+  for (const r of rows) {
+    r.delivery_logs = (r.delivery_logs ?? []).sort((a, b) => a.created_at.localeCompare(b.created_at))
+  }
+  return rows
 }

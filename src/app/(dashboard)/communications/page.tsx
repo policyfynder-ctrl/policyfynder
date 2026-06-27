@@ -25,7 +25,8 @@ export default async function CommunicationsPage() {
       <div>
         <h1 className="text-xl font-semibold tracking-tight">Communications</h1>
         <p className="text-muted-foreground text-sm">
-          Compose and queue messages. Queue-only — delivery is handled separately.
+          Compose and queue messages. A scheduled dispatcher delivers them — currently
+          in dry-run mode, so no live messages are sent.
         </p>
       </div>
 

@@ -1,13 +1,13 @@
 # PolicyFynder — Project Handoff
 
 **Last updated:** 2026-06-27
-**Phase:** Milestones 1–13 COMPLETE (built, verified local+cloud, committed, pushed). **Cloud + local at migration parity: 027.** On branch `milestone-13`. PRs #1–#7 merged to `main`; **M12 PR (#8) and M13 PR both open, targeting `main`, unmerged.** M13 branched off `milestone-12` (main lacks M12 until #8 merges), so the M13 PR stacks M12+M13 until #8 lands.
+**Phase:** Milestones 1–13 COMPLETE (built, verified local+cloud, merged to `main`). **`main` is the single source of truth through Milestone 13.** **Cloud + local DB at migration 027.** **No open PRs.** Currently on `main`.
 
 **Roadmap (next):**
-- **M14 — Public Website & Landing Page:** recreate policyfynder.com landing, SEO pages, product pages, lead capture, book-appointment CTA, customer login, RM login.
+- **M14 — Public Website & Landing Page (NEXT):** recreate policyfynder.com landing, SEO pages, product pages, lead capture, book-appointment CTA, customer login, RM login.
 - **M15 — Production Readiness:** Vercel deployment, env validation, monitoring, backups, security review, performance review, final UAT, launch checklist.
 
-**Git:** PRs #1–#7 (milestones 5–11) merged to `main` and those branches deleted. M12 PR (#8, milestone-12 → main) open. M13 PR (milestone-13 → main) open, NOT merged. Recommended merge order: #8 first, then the M13 PR. Repo: `github.com/policyfynder-ctrl/policyfynder`.
+**Git:** PRs #1–#9 all merged to `main`; milestone branches (5–13) deleted. **No open PRs.** `main` is the single source of truth (Milestones 1–13). Next milestone (M14) starts from a fresh branch off `main`. Repo: `github.com/policyfynder-ctrl/policyfynder`.
 
 **Cloud test data note:** Cloud test data has been cleaned up. The disposable cloudtest@example.com lead, appointment, and related activity logs were deleted after Milestone 10 verification. The seeded RM (cloud_rm@policyfynder.test) and its schedules remain as permanent seed data.
 

@@ -297,6 +297,117 @@ export type Database = {
         }
         Relationships: []
       }
+      communication_preferences: {
+        Row: {
+          email_opt_in: boolean
+          in_app_opt_in: boolean
+          preferred_channel: Database["public"]["Enums"]["notification_channel"]
+          profile_id: string
+          sms_opt_in: boolean
+          updated_at: string
+          whatsapp_opt_in: boolean
+        }
+        Insert: {
+          email_opt_in?: boolean
+          in_app_opt_in?: boolean
+          preferred_channel?: Database["public"]["Enums"]["notification_channel"]
+          profile_id: string
+          sms_opt_in?: boolean
+          updated_at?: string
+          whatsapp_opt_in?: boolean
+        }
+        Update: {
+          email_opt_in?: boolean
+          in_app_opt_in?: boolean
+          preferred_channel?: Database["public"]["Enums"]["notification_channel"]
+          profile_id?: string
+          sms_opt_in?: boolean
+          updated_at?: string
+          whatsapp_opt_in?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "communication_preferences_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consent_records: {
+        Row: {
+          action: string
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at: string
+          id: string
+          profile_id: string
+          source: string | null
+        }
+        Insert: {
+          action: string
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at?: string
+          id?: string
+          profile_id: string
+          source?: string | null
+        }
+        Update: {
+          action?: string
+          channel?: Database["public"]["Enums"]["notification_channel"]
+          created_at?: string
+          id?: string
+          profile_id?: string
+          source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consent_records_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_logs: {
+        Row: {
+          attempt: number
+          created_at: string
+          detail: string | null
+          id: string
+          notification_id: string
+          provider_response: Json | null
+          status: Database["public"]["Enums"]["notification_status"]
+        }
+        Insert: {
+          attempt?: number
+          created_at?: string
+          detail?: string | null
+          id?: string
+          notification_id: string
+          provider_response?: Json | null
+          status: Database["public"]["Enums"]["notification_status"]
+        }
+        Update: {
+          attempt?: number
+          created_at?: string
+          detail?: string | null
+          id?: string
+          notification_id?: string
+          provider_response?: Json | null
+          status?: Database["public"]["Enums"]["notification_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_logs_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       insurance_products: {
         Row: {
           created_at: string
@@ -729,7 +840,9 @@ export type Database = {
       notification_templates: {
         Row: {
           approved_at: string | null
+          body: string | null
           body_preview: string
+          category: Database["public"]["Enums"]["communication_category"] | null
           channel: Database["public"]["Enums"]["notification_channel"]
           created_at: string | null
           external_template_id: string | null
@@ -743,7 +856,11 @@ export type Database = {
         }
         Insert: {
           approved_at?: string | null
+          body?: string | null
           body_preview: string
+          category?:
+            | Database["public"]["Enums"]["communication_category"]
+            | null
           channel: Database["public"]["Enums"]["notification_channel"]
           created_at?: string | null
           external_template_id?: string | null
@@ -757,7 +874,11 @@ export type Database = {
         }
         Update: {
           approved_at?: string | null
+          body?: string | null
           body_preview?: string
+          category?:
+            | Database["public"]["Enums"]["communication_category"]
+            | null
           channel?: Database["public"]["Enums"]["notification_channel"]
           created_at?: string | null
           external_template_id?: string | null
@@ -774,8 +895,10 @@ export type Database = {
       notifications: {
         Row: {
           appointment_id: string | null
+          category: Database["public"]["Enums"]["communication_category"]
           channel: Database["public"]["Enums"]["notification_channel"]
           created_at: string
+          created_by: string | null
           error_message: string | null
           id: string
           lead_id: string | null
@@ -795,8 +918,10 @@ export type Database = {
         }
         Insert: {
           appointment_id?: string | null
+          category?: Database["public"]["Enums"]["communication_category"]
           channel?: Database["public"]["Enums"]["notification_channel"]
           created_at?: string
+          created_by?: string | null
           error_message?: string | null
           id?: string
           lead_id?: string | null
@@ -816,8 +941,10 @@ export type Database = {
         }
         Update: {
           appointment_id?: string | null
+          category?: Database["public"]["Enums"]["communication_category"]
           channel?: Database["public"]["Enums"]["notification_channel"]
           created_at?: string
+          created_by?: string | null
           error_message?: string | null
           id?: string
           lead_id?: string | null
@@ -841,6 +968,13 @@ export type Database = {
             columns: ["appointment_id"]
             isOneToOne: false
             referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
@@ -1689,6 +1823,15 @@ export type Database = {
           rm_name: string
         }[]
       }
+      get_recipient_preferences: {
+        Args: { p_profile_id: string }
+        Returns: {
+          email_opt_in: boolean
+          in_app_opt_in: boolean
+          sms_opt_in: boolean
+          whatsapp_opt_in: boolean
+        }[]
+      }
       get_rm_id: { Args: never; Returns: string }
       get_slot_availability: {
         Args: { p_branch_id?: string; p_date: string; p_start_time: string }
@@ -1833,6 +1976,16 @@ export type Database = {
         | "specialist"
         | "geographic"
         | "system"
+      communication_category:
+        | "renewal_reminder"
+        | "welcome"
+        | "appointment_confirmation"
+        | "appointment_reminder"
+        | "policy_issued"
+        | "policy_expiry"
+        | "follow_up"
+        | "claim_update"
+        | "custom"
       lead_source:
         | "instagram"
         | "facebook"
@@ -1860,6 +2013,7 @@ export type Database = {
         | "follow_up"
         | "policy_renewal_reminder"
         | "policy_renewal_overdue"
+        | "custom"
       policy_status: "draft" | "active" | "lapsed" | "cancelled" | "expired"
       user_role: "admin" | "rm" | "customer"
     }
@@ -2008,6 +2162,17 @@ export const Constants = {
         "geographic",
         "system",
       ],
+      communication_category: [
+        "renewal_reminder",
+        "welcome",
+        "appointment_confirmation",
+        "appointment_reminder",
+        "policy_issued",
+        "policy_expiry",
+        "follow_up",
+        "claim_update",
+        "custom",
+      ],
       lead_source: [
         "instagram",
         "facebook",
@@ -2037,6 +2202,7 @@ export const Constants = {
         "follow_up",
         "policy_renewal_reminder",
         "policy_renewal_overdue",
+        "custom",
       ],
       policy_status: ["draft", "active", "lapsed", "cancelled", "expired"],
       user_role: ["admin", "rm", "customer"],

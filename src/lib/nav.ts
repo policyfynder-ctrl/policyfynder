@@ -43,6 +43,13 @@ export function buildNavItems(perms: Set<string>, role?: string | null): NavItem
     perms.has('tasks.view_branch') ||
     perms.has('tasks.view_all')
 
+  const canUseComms =
+    perms.has('communications.send') ||
+    perms.has('communications.view_assigned') ||
+    perms.has('communications.view_team') ||
+    perms.has('communications.view_branch') ||
+    perms.has('communications.view_all')
+
   const canViewReports =
     perms.has('reports.view_own') ||
     perms.has('reports.view_team') ||
@@ -84,6 +91,11 @@ export function buildNavItems(perms: Set<string>, role?: string | null): NavItem
       label: 'Tasks',
       href: '/dashboard/tasks',
       show: canViewTasks,
+    },
+    {
+      label: 'Communications',
+      href: '/dashboard/communications',
+      show: canUseComms,
     },
     {
       label: 'Reports',

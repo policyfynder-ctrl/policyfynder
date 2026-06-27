@@ -1,9 +1,14 @@
 # PolicyFynder — Project Handoff
 
 **Last updated:** 2026-06-26
-**Phase:** Milestones 1–11 COMPLETE (built, verified local+cloud, committed, pushed). **Cloud + local at migration parity: 025.** On branch `milestone-11`. Next milestone: TBD.
+**Phase:** Milestones 1–12 COMPLETE (built, verified local+cloud, committed, pushed). **Cloud + local at migration parity: 026.** On branch `milestone-12`. PRs #1–#7 already merged to `main` + branches deleted; M12 PR is the only open one.
 
-**Open PRs (stacked, merge bottom-up 5→6→7→8→9→10→11):** [#2](https://github.com/policyfynder-ctrl/policyfynder/pull/2) 5→main · [#3](https://github.com/policyfynder-ctrl/policyfynder/pull/3) 6→5 · [#1](https://github.com/policyfynder-ctrl/policyfynder/pull/1) 7→6 · [#4](https://github.com/policyfynder-ctrl/policyfynder/pull/4) 8→7 · [#5](https://github.com/policyfynder-ctrl/policyfynder/pull/5) 9→8 · [#6](https://github.com/policyfynder-ctrl/policyfynder/pull/6) 10→9 · #7 11→10. Repo: `github.com/policyfynder-ctrl/policyfynder`.
+**Roadmap (next):**
+- **M13 — Live Communication Providers:** Microsoft Graph email, WhatsApp Business API, Edge Function dispatcher, retries, delivery_logs, webhooks. (Builds on the M12 queue: reads `notifications` where status='pending', writes `delivery_logs`, sets provider_message_id/status. Also: Template Management UI.)
+- **M14 — Public Website & Landing Page:** recreate policyfynder.com landing, SEO pages, product pages, lead capture, book-appointment CTA, customer login, RM login.
+- **M15 — Production Readiness:** Vercel deployment, env validation, monitoring, backups, security review, performance review, final UAT, launch checklist.
+
+**Git:** PRs #1–#7 (milestones 5–11) merged to `main` and those branches deleted. `main` is the single source of truth. M12 PR (#8, milestone-12 → main) is the only open PR. Repo: `github.com/policyfynder-ctrl/policyfynder`.
 
 **Cloud test data note:** Cloud test data has been cleaned up. The disposable cloudtest@example.com lead, appointment, and related activity logs were deleted after Milestone 10 verification. The seeded RM (cloud_rm@policyfynder.test) and its schedules remain as permanent seed data.
 
@@ -12,6 +17,14 @@
 Run cloud queries from the Mac (host) or REST — the direct DB host is IPv6-only (unreachable from colima containers). Local DB: `docker exec -i supabase_db_CRM psql -U postgres -d postgres -c "..."` (no psql on host).
 
 **Standing workflow (user-enforced every milestone):** investigate schema/RLS first → present migrations → WAIT for approval → apply LOCAL → build → verify LOCAL → STOP for approval before cloud push → STOP for separate approval before commit/push. Never push cloud or commit without explicit go-ahead.
+
+---
+
+## Milestone 12 — Communication Foundation (COMPLETE — local+cloud+committed, 2026-06-26)
+
+Migration 026 on cloud (verified 10/10 e2e). **Queue-only** — built on the single `notifications` queue; NO provider integration/sending (that's M13). Migration 026: `communication_category` enum (renewal_reminder/welcome/appointment_confirmation/appointment_reminder/policy_issued/policy_expiry/follow_up/claim_update/custom) + `category` on notifications & notification_templates; `notification_templates.body` ({{var}} content); `notifications.created_by`; **`type` stays NOT NULL** — added enum value `custom` for manual/RM-composed messages (category is the business classifier); `delivery_logs`, `communication_preferences`, `consent_records` tables; **strict consent trigger** `enforce_communication_consent` (blocks email/whatsapp/sms to non-opted-in recipients; in_app always allowed); `notifications_insert_staff` RLS (staff queue for in-scope records); **communication timeline trigger** → `activity_logs` (`communication.queued`/`sent`/… on linked policy/lead/appointment, visible to RM+customer); `communications` permissions; `get_recipient_preferences()` scoped fn; 12 seeded templates.
+
+App: services `communications.ts` (listTemplates, listComposeTargets [consent-aware allowed channels], queueMessage [type='custom'], listMessages), `preferences.ts`, `consent.ts`; `lib/templates.ts` (render+validate). Pages: staff `/dashboard/communications` (compose→live preview→queue + queue log); portal `/dashboard/profile` → `CommunicationPreferences` (consent toggles + preferred channel). Components in `features/communications/` + `features/portal/CommunicationPreferences`. Nav: Communications (staff). **Deferred to M13:** Template Management UI, Edge Function dispatcher, providers. `notifications.type` is NOT NULL (renewal generator uses real types; composed messages use 'custom').
 
 ---
 
@@ -265,12 +278,13 @@ Running via **colima** (not Docker Desktop) + Supabase CLI 2.107.0.
 **Date:** 2026-06-26
 **What was built:**
 
-- **Milestone 11 (Customer Portal)** finished end-to-end: migration 025 (email linking + handle_new_auth_user extension + backfill; profile role/email-escalation guard trigger; get_customer_rm; appointment_change_requests table+RLS+audit; dropped customer_own_appointment_update; holder_email index) applied local + cloud. Portal services + customer pages (dashboard, my-policies, renewals, appointments w/ change requests, notifications, profile) + staff request-resolution panel + customer nav.
-- Fixed two pre-existing security holes (customer role self-escalation; customer direct appointment mutation).
-- Verified local (9/9) and cloud (9/9 e2e). Committed `Milestone 11 - Customer Portal`, pushed `milestone-11`, PR #7 (base milestone-10, NOT merged).
+- **Milestone 12 (Communication Foundation, queue-only)** finished end-to-end: migration 026 (category enum, template body, delivery_logs, communication_preferences, consent_records, strict consent trigger, staff-insert RLS, communication-timeline activity trigger, `custom` type enum value, seeded templates) applied local + cloud. Services (communications/preferences/consent + template render helper), staff `/dashboard/communications` (compose→preview→queue + log), portal communication preferences + consent. No providers/sending (deferred to M13).
+- Revised mid-build per request: `notifications.type` kept NOT NULL with new enum value `custom`; `category` is the business classifier.
+- Verified local + cloud (10/10 e2e: strict consent, queue-only, timeline, RLS scope, customer-can't-queue, staff-in-scope, type=custom). Committed `Milestone 12 - Communication Foundation`, pushed `milestone-12`, PR (base main, NOT merged).
+- Earlier this session: merged PRs #1–#7 (M5–M11) into `main` and deleted those branches.
 
-**Stopped at:** M11 complete and on cloud; all 7 milestone PRs (#1–#7) open and unmerged.
-**Next action:** Await next milestone scope from the user (or merge the PR stack 5→6→7→8→9→10→11).
+**Stopped at:** M12 complete on cloud; M12 PR open (base main), unmerged.
+**Next action:** Await M13 scope (Live Communication Providers — see Roadmap at top), or other direction.
 
 ---
 

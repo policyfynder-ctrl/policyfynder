@@ -1,17 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
+import { env } from '@/lib/env'
 
 // Admin client bypasses all RLS policies.
-// Import ONLY in src/app/api/ route handlers — never in components or pages.
+// Import ONLY in src/app/api/ route handlers and server services — never in
+// components or pages. Env access is validated (env.ts) so a missing key fails
+// fast with a clear message rather than a cryptic Supabase error.
 export function createAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !key) {
-    throw new Error(
-      'createAdminClient: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set'
-    )
-  }
-  return createClient<Database>(url, key, {
+  return createClient<Database>(env.supabaseUrl, env.supabaseServiceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,

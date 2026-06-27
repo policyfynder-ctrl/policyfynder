@@ -1,13 +1,12 @@
 # PolicyFynder — Project Handoff
 
 **Last updated:** 2026-06-27
-**Phase:** Milestones 1–13 COMPLETE + merged to `main`. **Milestone 14 (Public Website) built + verified locally on branch `milestone-14`; PR open, NOT merged.** **Cloud + local DB at migration 027 (M14 adds NO migrations).** Currently on `milestone-14`.
+**Phase:** Milestones 1–14 COMPLETE + merged to `main`. **`main` is the single source of truth through Milestone 14.** **Cloud + local DB at migration 027 (M14 added NO migrations).** **No open PRs.** Currently on `main`.
 
 **Roadmap (next):**
-- **M14 — Public Website & Landing Page:** DONE (local) — see section below; PR open.
-- **M15 — Production Readiness:** Vercel deployment, env validation, monitoring, backups, security review, performance review, final UAT, launch checklist.
+- **M15 — Production Readiness & Launch (NEXT):** Vercel deployment, env validation, monitoring, backups, security review (incl. rotating the cloud service_role key + DB password exposed earlier), performance review, final UAT, launch checklist.
 
-**Git:** PRs #1–#9 merged to `main`; milestone branches (5–13) deleted. **M14 PR (milestone-14 → main) open, NOT merged.** Repo: `github.com/policyfynder-ctrl/policyfynder`.
+**Git:** PRs #1–#10 all merged to `main` (M14 = PR #10, regular merge commit `526bb85`); milestone branches (5–14) deleted. **No open PRs.** `main` is the single source of truth (Milestones 1–14). Next milestone (M15) starts from a fresh branch off `main`. Repo: `github.com/policyfynder-ctrl/policyfynder`.
 
 **Cloud test data note:** Cloud test data has been cleaned up. The disposable cloudtest@example.com lead, appointment, and related activity logs were deleted after Milestone 10 verification. The seeded RM (cloud_rm@policyfynder.test) and its schedules remain as permanent seed data.
 
@@ -19,9 +18,9 @@ Run cloud queries from the Mac (host) or REST — the direct DB host is IPv6-onl
 
 ---
 
-## Milestone 14 — Public Website & Landing Page (BUILT local, PR open — 2026-06-27)
+## Milestone 14 — Public Website & Landing Page (COMPLETE — merged to `main` via PR #10, 2026-06-27)
 
-**No migrations** (static marketing content; booking/auth reused). Branch `milestone-14`, PR base `main` (not merged). Verified local: typecheck/lint/build (46 static/SSG pages), route checks, branches-hidden, CTA, partners-text-only, no logo assets.
+**No migrations** (static marketing content; booking/auth reused). Merged to `main` (PR #10, regular merge commit `526bb85`); `milestone-14` branch deleted. Verified local: typecheck/lint/build (46 static/SSG pages), route checks, branches-hidden, CTA, partners-text-only, no logo assets.
 
 **Brand (exact, extracted from live policyfynder.com CSS):** literal hex tokens in `globals.css` — `--primary`(action) `#0b57d0`, `--brand` `#0041a2`, `--brand-navy` `#0a2540` / `--brand-navy-deep` `#001c37`, `--teal` `#0fb6a9`, surfaces `#f2f3ff`/`#e6edf5`, muted `#737785`. Fonts **Plus Jakarta Sans** (heading, `--font-jakarta`) + **Inter** (body) via next/font. Green removed (former `success` accents → `teal`). These tokens are app-wide (dashboard inherits the brand blue).
 

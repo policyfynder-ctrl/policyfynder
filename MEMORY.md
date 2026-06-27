@@ -1,12 +1,13 @@
 # PolicyFynder — Project Handoff
 
 **Last updated:** 2026-06-27
-**Phase:** Milestones 1–14 merged to `main`. **Milestone 15 (Production Readiness) built + verified locally on branch `milestone-15`; PR open, NOT merged.** **Cloud + local DB at migration 027 (M15 added NO migrations).** Currently on `milestone-15`.
+**Phase:** 🎉 **VERSION 1.0 COMPLETE.** All **Milestones 1–15 merged to `main`** (PRs #1–#11). **`main` is the single source of truth.** App version **1.0.0**; **DB migration 027** (local + cloud parity). No feature milestones remain — next steps are the v1.0 production launch (operational) + v1.1 roadmap. Currently on `main`.
 
 **Roadmap (next):**
-- **M15 — Production Readiness:** DONE (local) — see section below; PR open. After merge, the remaining work is OPERATIONAL (rotate keys, configure Vercel/prod Supabase, backups/PITR, monitoring) — see `docs/production/`.
+- **v1.0 launch (operational, human — NOT code):** rotate service_role key + DB password, configure Vercel/prod Supabase env, enable backups/PITR, set monitoring, keep comms dry-run until provider approval. See `docs/production/` + `FINAL_PRODUCTION_CHECKLIST.md` + `RELEASE_NOTES_v1.0.md`.
+- **v1.1+ (future features):** live communication providers go-live, template management UI, richer reporting/analytics, multi-branch geo-routing for booking, real partner logos, CSP + Sentry + perf analytics.
 
-**Git:** PRs #1–#10 merged to `main`; milestone branches (5–14) deleted. **M15 PR (milestone-15 → main) open, NOT merged.** Repo: `github.com/policyfynder-ctrl/policyfynder`.
+**Git:** PRs #1–#11 all merged to `main`; all milestone branches deleted. **No open PRs.** Tag **`v1.0.0`** marks the release. Repo: `github.com/policyfynder-ctrl/policyfynder`.
 
 **Cloud test data note:** Cloud test data has been cleaned up. The disposable cloudtest@example.com lead, appointment, and related activity logs were deleted after Milestone 10 verification. The seeded RM (cloud_rm@policyfynder.test) and its schedules remain as permanent seed data.
 
@@ -18,9 +19,9 @@ Run cloud queries from the Mac (host) or REST — the direct DB host is IPv6-onl
 
 ---
 
-## Milestone 15 — Production Readiness (BUILT local, PR open — 2026-06-27)
+## Milestone 15 — Production Readiness (COMPLETE — merged to `main` via PR #11, tagged v1.0.0, 2026-06-27)
 
-**No migrations.** Branch `milestone-15`, PR base `main` (not merged). Version bumped to **1.0.0**.
+**No migrations.** Merged to `main` (PR #11, regular merge commit `c63ee12`); `milestone-15` branch deleted. Version **1.0.0**.
 
 **Code/config:** `src/lib/env.ts` (typed env + validateEnv/assertEnv — core vars always required, provider/cron only when `COMMUNICATIONS_DRY_RUN='false'`; wired into the admin client); `next.config.ts` hardened (HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy; `poweredByHeader:false`; compress; `images.remotePatterns`; **no CSP yet — deferred**); `src/lib/appInfo.ts` (APP_VERSION/LATEST_DB_MIGRATION/commit); `/api/health` (`{status,version,commit,migration,timestamp}`, `?db=1` shallow ping); `ProductionBanner` in dashboard footer (only when NODE_ENV=production).
 

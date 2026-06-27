@@ -4,7 +4,7 @@ import { useActionState, useState } from 'react'
 import {
   rescheduleAppointmentAction,
   type ApptActionState,
-} from '@/app/(dashboard)/appointments/actions'
+} from '@/app/dashboard/appointments/actions'
 import { SlotPicker, type SelectedSlot } from './SlotPicker'
 import { Button } from '@/components/ui/button'
 import { FormError, FormSuccess } from '@/components/features/auth/FormBanner'

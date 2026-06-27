@@ -4,7 +4,7 @@ import { useActionState } from 'react'
 import {
   updateAppointmentStatusAction,
   type ApptActionState,
-} from '@/app/(dashboard)/appointments/actions'
+} from '@/app/dashboard/appointments/actions'
 import { ASSIGNABLE_APPOINTMENT_STATUSES, appointmentStatusLabel } from '@/lib/appointments'
 import { Button } from '@/components/ui/button'
 import { FormError, FormSuccess } from '@/components/features/auth/FormBanner'

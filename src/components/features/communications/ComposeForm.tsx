@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState, useMemo, useState } from 'react'
-import { queueMessageAction, type ComposeState } from '@/app/(dashboard)/communications/actions'
+import { queueMessageAction, type ComposeState } from '@/app/dashboard/communications/actions'
 import { renderTemplateString, extractVariables } from '@/lib/templates'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'

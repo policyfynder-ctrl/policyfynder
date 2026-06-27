@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { updatePolicyAction, type PolicyActionState } from '@/app/(dashboard)/policies/actions'
+import { updatePolicyAction, type PolicyActionState } from '@/app/dashboard/policies/actions'
 import { POLICY_STATUSES, policyStatusLabel } from '@/lib/policies'
 import { Button } from '@/components/ui/button'
 import { FormError, FormSuccess } from '@/components/features/auth/FormBanner'

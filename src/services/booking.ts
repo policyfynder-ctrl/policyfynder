@@ -79,6 +79,17 @@ export async function getAvailableSlots(branchId: string): Promise<AvailableSlot
     .filter((s) => new Date(`${s.slotDate}T${s.slotStart}`) > now)
 }
 
+/** All bookable (active) branches — drives the public /book branch selector. */
+export async function listActiveBranches(): Promise<BranchSummary[]> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('branches')
+    .select('id, name, code, timezone')
+    .eq('is_active', true)
+    .order('name', { ascending: true })
+  return (data ?? []).filter((b) => b.code) as BranchSummary[]
+}
+
 export type ProductOption = { slug: string; name: string }
 
 /** Active insurance products, for the "what are you interested in?" picker. */

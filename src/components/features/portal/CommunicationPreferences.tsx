@@ -2,7 +2,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { Button } from '@/components/ui/button'
-import { consentToggleAction, updatePreferencesAction } from '@/app/(dashboard)/profile/actions'
+import { consentToggleAction, updatePreferencesAction } from '@/app/dashboard/profile/actions'
 import type { Preferences } from '@/services/preferences'
 
 const CHANNELS: { key: 'email' | 'whatsapp' | 'sms'; label: string; note?: string }[] = [

@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { createTeamAction, type TeamActionState } from '@/app/(dashboard)/teams/actions'
+import { createTeamAction, type TeamActionState } from '@/app/dashboard/teams/actions'
 import { FormField } from '@/components/features/auth/FormField'
 import { FormError, FormSuccess } from '@/components/features/auth/FormBanner'
 import { Button } from '@/components/ui/button'

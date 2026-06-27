@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { toggleRmActiveAction, type RmActionState } from '@/app/(dashboard)/rms/actions'
+import { toggleRmActiveAction, type RmActionState } from '@/app/dashboard/rms/actions'
 import { Button } from '@/components/ui/button'
 import { FormError, FormSuccess } from '@/components/features/auth/FormBanner'
 

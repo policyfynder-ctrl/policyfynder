@@ -5,7 +5,7 @@ import {
   addMemberAction,
   removeMemberForm,
   type TeamActionState,
-} from '@/app/(dashboard)/teams/actions'
+} from '@/app/dashboard/teams/actions'
 import { Button } from '@/components/ui/button'
 import { FormError, FormSuccess } from '@/components/features/auth/FormBanner'
 import type { TeamMember } from '@/services/teams'

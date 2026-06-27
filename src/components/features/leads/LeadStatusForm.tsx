@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { updateLeadStatusAction, type StatusActionState } from '@/app/(dashboard)/leads/actions'
+import { updateLeadStatusAction, type StatusActionState } from '@/app/dashboard/leads/actions'
 import { LEAD_STATUSES, leadStatusLabel } from '@/lib/leads'
 import { Button } from '@/components/ui/button'
 import { FormError, FormSuccess } from '@/components/features/auth/FormBanner'

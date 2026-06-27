@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { updateProfileAction, type ProfileActionState } from '@/app/(dashboard)/profile/actions'
+import { updateProfileAction, type ProfileActionState } from '@/app/dashboard/profile/actions'
 import { Button } from '@/components/ui/button'
 import { FormField } from '@/components/features/auth/FormField'
 import { FormError, FormSuccess } from '@/components/features/auth/FormBanner'

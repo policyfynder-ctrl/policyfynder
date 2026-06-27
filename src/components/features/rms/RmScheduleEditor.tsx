@@ -5,7 +5,7 @@ import {
   addScheduleAction,
   deleteScheduleForm,
   type RmActionState,
-} from '@/app/(dashboard)/rms/actions'
+} from '@/app/dashboard/rms/actions'
 import { DAY_LABELS, dayLabel, fmtTime } from '@/lib/rms'
 import { Button } from '@/components/ui/button'
 import { FormError, FormSuccess } from '@/components/features/auth/FormBanner'

@@ -1,13 +1,13 @@
 # PolicyFynder — Project Handoff
 
 **Last updated:** 2026-06-27
-**Phase:** Milestones 1–13 COMPLETE (built, verified local+cloud, merged to `main`). **`main` is the single source of truth through Milestone 13.** **Cloud + local DB at migration 027.** **No open PRs.** Currently on `main`.
+**Phase:** Milestones 1–13 COMPLETE + merged to `main`. **Milestone 14 (Public Website) built + verified locally on branch `milestone-14`; PR open, NOT merged.** **Cloud + local DB at migration 027 (M14 adds NO migrations).** Currently on `milestone-14`.
 
 **Roadmap (next):**
-- **M14 — Public Website & Landing Page (NEXT):** recreate policyfynder.com landing, SEO pages, product pages, lead capture, book-appointment CTA, customer login, RM login.
+- **M14 — Public Website & Landing Page:** DONE (local) — see section below; PR open.
 - **M15 — Production Readiness:** Vercel deployment, env validation, monitoring, backups, security review, performance review, final UAT, launch checklist.
 
-**Git:** PRs #1–#9 all merged to `main`; milestone branches (5–13) deleted. **No open PRs.** `main` is the single source of truth (Milestones 1–13). Next milestone (M14) starts from a fresh branch off `main`. Repo: `github.com/policyfynder-ctrl/policyfynder`.
+**Git:** PRs #1–#9 merged to `main`; milestone branches (5–13) deleted. **M14 PR (milestone-14 → main) open, NOT merged.** Repo: `github.com/policyfynder-ctrl/policyfynder`.
 
 **Cloud test data note:** Cloud test data has been cleaned up. The disposable cloudtest@example.com lead, appointment, and related activity logs were deleted after Milestone 10 verification. The seeded RM (cloud_rm@policyfynder.test) and its schedules remain as permanent seed data.
 
@@ -16,6 +16,24 @@
 Run cloud queries from the Mac (host) or REST — the direct DB host is IPv6-only (unreachable from colima containers). Local DB: `docker exec -i supabase_db_CRM psql -U postgres -d postgres -c "..."` (no psql on host).
 
 **Standing workflow (user-enforced every milestone):** investigate schema/RLS first → present migrations → WAIT for approval → apply LOCAL → build → verify LOCAL → STOP for approval before cloud push → STOP for separate approval before commit/push. Never push cloud or commit without explicit go-ahead.
+
+---
+
+## Milestone 14 — Public Website & Landing Page (BUILT local, PR open — 2026-06-27)
+
+**No migrations** (static marketing content; booking/auth reused). Branch `milestone-14`, PR base `main` (not merged). Verified local: typecheck/lint/build (46 static/SSG pages), route checks, branches-hidden, CTA, partners-text-only, no logo assets.
+
+**Brand (exact, extracted from live policyfynder.com CSS):** literal hex tokens in `globals.css` — `--primary`(action) `#0b57d0`, `--brand` `#0041a2`, `--brand-navy` `#0a2540` / `--brand-navy-deep` `#001c37`, `--teal` `#0fb6a9`, surfaces `#f2f3ff`/`#e6edf5`, muted `#737785`. Fonts **Plus Jakarta Sans** (heading, `--font-jakarta`) + **Inter** (body) via next/font. Green removed (former `success` accents → `teal`). These tokens are app-wide (dashboard inherits the brand blue).
+
+**Routing fix (latent bug):** `src/app/(dashboard)` was a route GROUP (no URL segment) so pages resolved at `/`, `/leads`, … while nav/middleware/login all used `/dashboard/*`. Renamed group → real segment `src/app/dashboard/` (33 `git mv` + 18 import-path updates `@/app/(dashboard)`→`@/app/dashboard`). Now `/dashboard/*` resolves correctly and `/` is free for the landing page. Deleted the create-next-app `src/app/page.tsx`.
+
+**Structure:** new `(marketing)` route group + `MarketingHeader`(mobile nav)/`MarketingFooter`. Pages: `/` landing, `/insurance` hub + `/insurance/[category]` (6 SSG product pages from `src/lib/insurance.ts`), `/about`, `/contact` (server action → `leads`, `source='other'`, message in `leads.metadata`; admin client), `/claims`, `/knowledge` + `/knowledge/[slug]` (SSG from `src/lib/knowledge.ts`, typed content — NO MDX dep), `/privacy`, `/terms` (legal templates). SEO: `app/sitemap.ts`, `app/robots.ts`, per-page `generateMetadata`, JSON-LD (Organization/WebSite/FAQPage/Breadcrumb/Article).
+
+**Booking — branches HIDDEN from customers:** `/book` is now the booking page itself (no branch selector); it picks the branch server-side (`listActiveBranches()[0]`, never shown) and `/api/book` assigns the least-busy RM. `?interest=<slug>` from product CTAs pre-selects a category. `/book/[branch]` kept for deep-link compat but branch name stripped from UI. Public CTA everywhere = **"Book Free Consultation"**.
+
+**Our Insurance Partners section** (`src/components/features/marketing/InsurancePartners.tsx` + `src/lib/partners.ts`): **30 verified insurer NAMES** as text-placeholder tiles (logo-ready: set `logo` path per entry to swap in an `<Image>`). Excluded (per approval): Galaxy Health, Magma HDI, and 2 unclear circular govt-insurer emblems. **No logo image assets** (`public/partners` does not exist). Note shown: "Insurance products are offered through our empanelled insurance partners." **Real logos pending official licensed files (SVG preferred, transparent PNG ok) + approval.**
+
+**New UI primitives** (`@base-ui/react`): `accordion`, `separator`, `avatar`. Middleware matcher trimmed to `/dashboard/:path*`,`/login`,`/signup`,`/reset-password` (marketing skips per-request getUser for CWV). `vercel.json` cron unchanged. UI UX Pro Max skill committed with M14 (`.claude/skills/ui-ux-pro-max/`).
 
 ---
 

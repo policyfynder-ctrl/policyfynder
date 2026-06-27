@@ -18,13 +18,15 @@ export function BookingForm({
   branchCode,
   slots,
   products,
+  initialInterests = [],
 }: {
   branchCode: string
   slots: AvailableSlot[]
   products: ProductOption[]
+  initialInterests?: string[]
 }) {
   const [slot, setSlot] = useState<SelectedSlot | null>(null)
-  const [interests, setInterests] = useState<string[]>([])
+  const [interests, setInterests] = useState<string[]>(initialInterests)
   const [fieldErrors, setFieldErrors] = useState<BookingFieldErrors>({})
   const [formError, setFormError] = useState<string | undefined>()
   const [status, setStatus] = useState<Status>('idle')
@@ -196,7 +198,7 @@ export function BookingForm({
       </Card>
 
       <Button type="submit" className="w-full" disabled={status === 'submitting'}>
-        {status === 'submitting' ? 'Booking…' : 'Book appointment'}
+        {status === 'submitting' ? 'Booking…' : 'Book Free Consultation'}
       </Button>
     </form>
   )

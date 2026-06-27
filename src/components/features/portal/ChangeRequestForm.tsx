@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState, useState } from 'react'
-import { requestChangeAction, type RequestActionState } from '@/app/(dashboard)/my-appointments/actions'
+import { requestChangeAction, type RequestActionState } from '@/app/dashboard/my-appointments/actions'
 import { Button } from '@/components/ui/button'
 import { FormError, FormSuccess } from '@/components/features/auth/FormBanner'
 

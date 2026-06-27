@@ -2,7 +2,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { listRequestsForAppointment } from '@/services/changeRequests'
-import { resolveRequestAction } from '@/app/(dashboard)/appointments/actions'
+import { resolveRequestAction } from '@/app/dashboard/appointments/actions'
 
 // Staff panel: pending customer change requests for this appointment, with
 // approve/decline. Approving a cancel also cancels the appointment. RLS gates

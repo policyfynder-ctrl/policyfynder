@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
-import { completeTaskAction } from '@/app/(dashboard)/tasks/actions'
+import { completeTaskAction } from '@/app/dashboard/tasks/actions'
 import type { TaskRow } from '@/services/tasks'
 
 function fmt(iso: string | null): string {

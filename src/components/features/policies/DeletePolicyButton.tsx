@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { deletePolicyAction } from '@/app/(dashboard)/policies/actions'
+import { deletePolicyAction } from '@/app/dashboard/policies/actions'
 import { Button } from '@/components/ui/button'
 
 // Soft-delete control. Asks for confirmation, then posts to the server action

@@ -4,7 +4,7 @@ import { useActionState } from 'react'
 import {
   cancelAppointmentAction,
   type ApptActionState,
-} from '@/app/(dashboard)/appointments/actions'
+} from '@/app/dashboard/appointments/actions'
 import { Button } from '@/components/ui/button'
 import { FormError, FormSuccess } from '@/components/features/auth/FormBanner'
 

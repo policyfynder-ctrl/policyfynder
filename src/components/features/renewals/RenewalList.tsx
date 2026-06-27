@@ -5,7 +5,7 @@ import {
   logContactAction,
   markRenewedAction,
   createRenewalTaskAction,
-} from '@/app/(dashboard)/renewals/actions'
+} from '@/app/dashboard/renewals/actions'
 import type { RenewalRow } from '@/services/policies'
 
 const actBtn = buttonVariants({ size: 'sm', variant: 'outline' }) + ' h-7 px-2 text-xs'

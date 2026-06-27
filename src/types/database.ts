@@ -897,6 +897,7 @@ export type Database = {
           appointment_id: string | null
           category: Database["public"]["Enums"]["communication_category"]
           channel: Database["public"]["Enums"]["notification_channel"]
+          claimed_at: string | null
           created_at: string
           created_by: string | null
           error_message: string | null
@@ -920,6 +921,7 @@ export type Database = {
           appointment_id?: string | null
           category?: Database["public"]["Enums"]["communication_category"]
           channel?: Database["public"]["Enums"]["notification_channel"]
+          claimed_at?: string | null
           created_at?: string
           created_by?: string | null
           error_message?: string | null
@@ -943,6 +945,7 @@ export type Database = {
           appointment_id?: string | null
           category?: Database["public"]["Enums"]["communication_category"]
           channel?: Database["public"]["Enums"]["notification_channel"]
+          claimed_at?: string | null
           created_at?: string
           created_by?: string | null
           error_message?: string | null
@@ -1808,6 +1811,39 @@ export type Database = {
       }
     }
     Functions: {
+      claim_due_notifications: {
+        Args: { p_limit?: number }
+        Returns: {
+          appointment_id: string | null
+          category: Database["public"]["Enums"]["communication_category"]
+          channel: Database["public"]["Enums"]["notification_channel"]
+          claimed_at: string | null
+          created_at: string
+          created_by: string | null
+          error_message: string | null
+          id: string
+          lead_id: string | null
+          max_retries: number
+          next_retry_at: string | null
+          payload: Json
+          policy_id: string | null
+          provider_message_id: string | null
+          recipient_id: string
+          retry_count: number
+          scheduled_at: string
+          sent_at: string | null
+          status: Database["public"]["Enums"]["notification_status"]
+          template_id: string | null
+          template_ref_id: string | null
+          type: Database["public"]["Enums"]["notification_type"]
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "notifications"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       generate_renewal_reminders: {
         Args: { p_days_ahead?: number }
         Returns: number

@@ -1,14 +1,13 @@
 # PolicyFynder — Project Handoff
 
-**Last updated:** 2026-06-26
-**Phase:** Milestones 1–12 COMPLETE (built, verified local+cloud, committed, pushed). **Cloud + local at migration parity: 026.** On branch `milestone-12`. PRs #1–#7 already merged to `main` + branches deleted; M12 PR is the only open one.
+**Last updated:** 2026-06-27
+**Phase:** Milestones 1–13 COMPLETE (built, verified local+cloud, committed, pushed). **Cloud + local at migration parity: 027.** On branch `milestone-13`. PRs #1–#7 merged to `main`; **M12 PR (#8) and M13 PR both open, targeting `main`, unmerged.** M13 branched off `milestone-12` (main lacks M12 until #8 merges), so the M13 PR stacks M12+M13 until #8 lands.
 
 **Roadmap (next):**
-- **M13 — Live Communication Providers:** Microsoft Graph email, WhatsApp Business API, Edge Function dispatcher, retries, delivery_logs, webhooks. (Builds on the M12 queue: reads `notifications` where status='pending', writes `delivery_logs`, sets provider_message_id/status. Also: Template Management UI.)
 - **M14 — Public Website & Landing Page:** recreate policyfynder.com landing, SEO pages, product pages, lead capture, book-appointment CTA, customer login, RM login.
 - **M15 — Production Readiness:** Vercel deployment, env validation, monitoring, backups, security review, performance review, final UAT, launch checklist.
 
-**Git:** PRs #1–#7 (milestones 5–11) merged to `main` and those branches deleted. `main` is the single source of truth. M12 PR (#8, milestone-12 → main) is the only open PR. Repo: `github.com/policyfynder-ctrl/policyfynder`.
+**Git:** PRs #1–#7 (milestones 5–11) merged to `main` and those branches deleted. M12 PR (#8, milestone-12 → main) open. M13 PR (milestone-13 → main) open, NOT merged. Recommended merge order: #8 first, then the M13 PR. Repo: `github.com/policyfynder-ctrl/policyfynder`.
 
 **Cloud test data note:** Cloud test data has been cleaned up. The disposable cloudtest@example.com lead, appointment, and related activity logs were deleted after Milestone 10 verification. The seeded RM (cloud_rm@policyfynder.test) and its schedules remain as permanent seed data.
 
@@ -17,6 +16,23 @@
 Run cloud queries from the Mac (host) or REST — the direct DB host is IPv6-only (unreachable from colima containers). Local DB: `docker exec -i supabase_db_CRM psql -U postgres -d postgres -c "..."` (no psql on host).
 
 **Standing workflow (user-enforced every milestone):** investigate schema/RLS first → present migrations → WAIT for approval → apply LOCAL → build → verify LOCAL → STOP for approval before cloud push → STOP for separate approval before commit/push. Never push cloud or commit without explicit go-ahead.
+
+---
+
+## Milestone 13 — Live Communication Providers (COMPLETE — local+cloud, 2026-06-27)
+
+Migration 027 on cloud (verified 33/33 e2e). **Dry-run by default** — `COMMUNICATIONS_DRY_RUN` true/unset simulates sends (no live email/WhatsApp/SMS). Dispatcher runs as a **Vercel-Cron Next.js route** (NOT a Supabase Edge Function — CLI isn't logged in for `functions deploy`, and Vercel-Cron reuses the existing admin-client pattern).
+
+**Migration 027 `communication_dispatch` (minimal claim layer only):** `notifications.claimed_at`; `claim_due_notifications(p_limit)` SECURITY DEFINER, **service_role-only** (REVOKE from anon/authenticated/PUBLIC), atomically claims due rows with `FOR UPDATE SKIP LOCKED` + 15-min stale-claim recovery (excludes in_app; pending OR failed-retryable-with-next_retry_at-passed); `idx_notifications_retry`. **No webhook_events table, no template-RLS loosening** (deferred per decision). The M12 queue already had retry_count/max_retries/next_retry_at/provider_message_id/template_ref_id/body/category — dispatch needs no other schema change.
+
+**App layer:**
+- `src/lib/providers/`: `types.ts` (isDryRun/dryRunMessageId, SendResult), `graph.ts` (Microsoft Graph email, client-credentials, sendMail; **202 = terminal `sent`** — no delivered/read webhook for email), `whatsapp.ts` (Cloud API template send + `verifyWebhookChallenge`/`verifyWebhookSignature` HMAC-SHA256 + `parseStatusUpdates`).
+- `src/services/dispatch.ts` (service role): `runDispatchCycle(limit)` → claim → re-validate vars → **live consent re-check** (revoke-after-queue blocks send) → render → channel adapter → on success status=sent+provider_message_id+sent_at; retryable fail → retry_count++ + exp backoff (2/4/8m) + claimed_at=NULL (re-claimable); terminal fail → retries exhausted; every attempt appends `delivery_logs`. SMS = terminal "not implemented".
+- API routes: `src/app/api/cron/dispatch/route.ts` (CRON_SECRET Bearer-gated, GET+POST), `src/app/api/webhooks/whatsapp/route.ts` (GET verify-token handshake; POST HMAC-verified, forward-only status via RANK pending<sent<delivered<read, idempotent, updates notifications.status → M12 timeline trigger fires). `vercel.json` cron `*/2 * * * *`.
+- UI: `communications.ts listMessages` now embeds delivery_logs + status/provider_id/retries/error; `MessageQueueList.tsx` is now a client component with an expandable per-attempt delivery trail; page copy says "dispatcher … dry-run".
+- Docs: `docs/communication-providers.md` (Azure + Meta setup, pipeline diagram, local dry-run test). `.env.local.example` += COMMUNICATIONS_DRY_RUN, CRON_SECRET, GRAPH_*, WHATSAPP_*.
+
+**Verified:** LOCAL — typecheck/lint/build clean; SQL claim harness (claims due external only; excludes in_app/future/exhausted/future-backoff/fresh-claim; re-claims stale; authenticated denied); two-transaction SKIP LOCKED concurrency (disjoint); full dev-server e2e (email sent dry-run, consent-revoke terminal fail, whatsapp sent, webhook signature/idempotent/forward-only, delivery_logs + timeline). CLOUD — 33/33 e2e (same coverage incl. RLS scope + customer-visible timeline). All test data cleaned. **Reminder: WhatsApp send requires `notification_templates.external_template_id` (Meta-approved name) — null = terminal fail (correct).**
 
 ---
 

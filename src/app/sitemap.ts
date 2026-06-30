@@ -16,6 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/knowledge',
     '/privacy',
     '/terms',
+    '/data-deletion',
   ]
   const categoryPaths = categorySlugs.map((s) => `/insurance/${s}`)
   const articlePaths = articleSlugs.map((s) => `/knowledge/${s}`)

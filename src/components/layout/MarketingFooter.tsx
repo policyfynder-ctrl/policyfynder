@@ -81,6 +81,9 @@ export function MarketingFooter() {
             <Link href="/terms" className="hover:text-foreground">
               Terms &amp; Conditions
             </Link>
+            <Link href="/data-deletion" className="hover:text-foreground">
+              Data Deletion
+            </Link>
           </div>
         </div>
       </div>
